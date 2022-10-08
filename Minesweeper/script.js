@@ -5,17 +5,22 @@ const rEl = document.querySelector("#rows");
 const cEl = document.querySelector("#cols");
 const mEl = document.querySelector("#mines");
 const sbm = document.querySelector("button");
+const timeLabel = document.querySelector(".time");
 
 const margin = 10;
 const boxSize = 20;
 
+
 let firstClick = true;
+let startTime, currTime;
+let countTime = false;
 
 let x, y;
 let mines;
 let map = [];
 let mineNeighbours = [];
 let allTiles = [];
+let timer;
 
 let game = {
     //Variables and consts
@@ -27,13 +32,13 @@ let game = {
         "mine-neighbour" : "#ffa142",
         "flag" : "#10c964",
     },
-
     //Functions
     clearVars : () => { 
         map.length = 0;
         mineNeighbours.length = 0;
         allTiles.length = 0;
         firstClick = true;
+        startTime = new Date();
     },
 
     //TODO: Validate input (mines < rows * cols)
@@ -107,16 +112,22 @@ let game = {
     checkWin : () => {
         let revealed = allTiles.filter(el => !el.hidden);
         if(revealed.length == allTiles.length - mines){
+            countTime = false;
             game.revealTheMap();
-            alert("You win!");
+            alert(`You won in ${currTime} seconds!`);
         }
     },
 
     restart : () => { 
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
         game.clearVars();
         game.readInput();
         game.generateMap();
+        countTime = true;
+        timer = setInterval(() => {
+            if(countTime){
+                timeLabel.innerHTML = `Time: ${currTime = Math.floor((new Date() - startTime) / 1000)} s`;
+            }
+        }, 1000);
     }
 }
 
@@ -136,14 +147,12 @@ canvas.addEventListener("click", (e) => {
     if(map[y][x].flag) { return; }
 
     map[y][x].click();
-    // When mine clicked
+    // When mine clicked (Lose the game)
     if(map[y][x].mine && !firstClick){
         //Reveal the map
         game.revealTheMap();
-        alert("Game Over");
-        //TODO: Clear the map after some input
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // setTimeout(game.restart(), 5000);
+        countTime = false;
+        alert(`Game Over. You lost in ${currTime} seconds.`);
         return;
     }
     // Regenerate if first click is a mine
