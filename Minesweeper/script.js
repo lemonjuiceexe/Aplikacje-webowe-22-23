@@ -10,7 +10,6 @@ const timeLabel = document.querySelector(".time");
 const margin = 10;
 const boxSize = 20;
 
-
 let firstClick = true;
 let startTime, currTime;
 let countTime = false;
@@ -21,6 +20,8 @@ let map = [];
 let mineNeighbours = [];
 let allTiles = [];
 let timer;
+
+//TODO: Don't allow clicking after the win/lose
 
 let game = {
     //Variables and consts
@@ -114,10 +115,38 @@ let game = {
         if(revealed.length == allTiles.length - mines){
             countTime = false;
             game.revealTheMap();
-            alert(`You won in ${currTime} seconds!`);
+            alert(`You won in ${ Utils.formatTime(currTime) } seconds!`);
+
+            console.log(Utils.getCookie(`bestTimes-${x-1}-${y-1}-${mines}`));
+
+            let temp = Utils.getCookie(`bestTimes-${x-1}-${y-1}-${mines}`, []);
+            let bestTimes = temp.length > 0 ? temp.split(",") : [];
+            // bestTimes.splice(0, 1)
+            // bestTimes.splice(bestTimes.length - 1, 1);
+            for(let i = 0; i < bestTimes.length; i++){
+                bestTimes[i] = Number(bestTimes[i]);
+            }
+            currTime = Number(currTime);
+            if(bestTimes == undefined){ 
+                bestTimes = [];
+                bestTimes.push(currTime);
+            }
+            else if(bestTimes.length < 10){
+                bestTimes.push(currTime);
+                bestTimes.sort();
+            }
+            else{
+                if(bestTimes[9] > currTime){
+                    bestTimes[9] = currTime;
+                    bestTimes.sort();
+                }
+            }
+            // bestTimes.forEach((el) => { el = parseInt(el); });
+            console.log(bestTimes);
+            Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimes, 365);
         }
     },
-
+    //TODO: change cookie name xy
     restart : () => { 
         game.clearVars();
         game.readInput();
@@ -125,7 +154,8 @@ let game = {
         countTime = true;
         timer = setInterval(() => {
             if(countTime){
-                timeLabel.innerHTML = `Time: ${currTime = Math.floor((new Date() - startTime) / 1000)} s`;
+                currTime = new Date() - startTime;
+                timeLabel.innerHTML = `Time: ${ Utils.formatTime(currTime) } s`;
             }
         }, 1000);
     }
@@ -134,16 +164,12 @@ let game = {
 //Submit button
 sbm.addEventListener("click", () => {
     game.restart();
-    // game.clearVars();
-    // game.readInput();
-    // game.generateMap();
 });
 //Clicking on canvas
 canvas.addEventListener("click", (e) => {
     let x = Math.floor((e.offsetX - margin) / boxSize);
     let y = Math.floor((e.offsetY - margin) / boxSize);
-    console.log(x, y);
-    
+
     if(map[y][x].flag) { return; }
 
     map[y][x].click();
@@ -152,7 +178,7 @@ canvas.addEventListener("click", (e) => {
         //Reveal the map
         game.revealTheMap();
         countTime = false;
-        alert(`Game Over. You lost in ${currTime} seconds.`);
+        alert(`Game Over. You lost in ${ Utils.formatTime(currTime) } seconds.`);
         return;
     }
     // Regenerate if first click is a mine
@@ -271,5 +297,44 @@ class Box{
             this.color(game.colors.flag);
             this.flag = true;
         }
+    }
+}
+
+class Utils{
+    static getCookie = (cname, defaultValue="") => {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+
+        return defaultValue;
+    }
+    static setCookie = (cname, cvalue, expire) => {
+        let d = new Date();
+        d.setTime(d.getTime() + (expire*24*60*60*1000));
+        let expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/;Secure";
+    }
+    static deleteAllCookies = () => {
+        var cookies = document.cookie.split(";");
+
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            var eqPos = cookie.indexOf("=");
+            var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+    }
+
+    static formatTime = (time) => { 
+        return Math.floor(time / 1000);
     }
 }
