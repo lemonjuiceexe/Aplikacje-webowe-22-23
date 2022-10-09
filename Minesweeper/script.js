@@ -22,6 +22,7 @@ let allTiles = [];
 let timer;
 
 //TODO: Don't allow clicking after the win/lose
+//TODO: Check if cookies have path and expire time
 
 let game = {
     //Variables and consts
@@ -42,7 +43,7 @@ let game = {
         startTime = new Date();
     },
 
-    //TODO: Validate input (mines < rows * cols)
+    //TODO: Validate input (mines < rows * cols) and rows < x and columns < x
     readInput : () => {
         y = rEl.value; x = cEl.value;
         mines = mEl.value;
@@ -116,16 +117,8 @@ let game = {
             countTime = false;
             game.revealTheMap();
             alert(`You won in ${ Utils.formatTime(currTime) } seconds!`);
-
-            console.log(Utils.getCookie(`bestTimes-${x-1}-${y-1}-${mines}`));
-
-            let temp = Utils.getCookie(`bestTimes-${x-1}-${y-1}-${mines}`, []);
-            let bestTimes = temp.length > 0 ? temp.split(",") : [];
-            // bestTimes.splice(0, 1)
-            // bestTimes.splice(bestTimes.length - 1, 1);
-            for(let i = 0; i < bestTimes.length; i++){
-                bestTimes[i] = Number(bestTimes[i]);
-            }
+            
+            bestTimes = Utils.getBestTimes(x, y, mines);
             currTime = Number(currTime);
             if(bestTimes == undefined){ 
                 bestTimes = [];
@@ -133,31 +126,44 @@ let game = {
             }
             else if(bestTimes.length < 10){
                 bestTimes.push(currTime);
-                bestTimes.sort();
             }
             else{
                 if(bestTimes[9] > currTime){
                     bestTimes[9] = currTime;
-                    bestTimes.sort();
                 }
             }
-            // bestTimes.forEach((el) => { el = parseInt(el); });
-            console.log(bestTimes);
+            bestTimes = bestTimes.sort((a, b) => a - b);
             Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimes, 365);
+
+            game.displayScores(bestTimes);
         }
     },
-    //TODO: change cookie name xy
+
+    displayScores : (bestTimes) => {
+        console.log("DISPLAY");
+        let scores = document.querySelectorAll(".scores > *");
+        scores.forEach((el, i) => { 
+            if(bestTimes[i] != undefined){
+                el.innerHTML = `<strong>${bestTimes[i]} ms</strong>`;
+            }
+            else{
+                el.innerHTML = "-- ms";
+            }
+        });
+    },
+
     restart : () => { 
         game.clearVars();
         game.readInput();
         game.generateMap();
+        game.displayScores(Utils.getBestTimes(x, y, mines));
         countTime = true;
         timer = setInterval(() => {
             if(countTime){
                 currTime = new Date() - startTime;
                 timeLabel.innerHTML = `Time: ${ Utils.formatTime(currTime) } s`;
             }
-        }, 1000);
+        }, 300);
     }
 }
 
@@ -334,7 +340,20 @@ class Utils{
         }
     }
 
+    static getBestTimes(_x, _y, _m){ // Return best times for the given map (_x x _y with _m mines)
+        //Get best times from cookies as string/empty array
+        let temp = Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, []);
+        let bestTimes = temp.length > 0 ? temp.split(",") : [];
+        // Cast array to int
+        for(let i = 0; i < bestTimes.length; i++){
+            bestTimes[i] = Number(bestTimes[i]);
+        }
+
+        return bestTimes;
+    }
+
     static formatTime = (time) => { 
+        if(isNaN(Math.floor(time / 1000))) { return 0;}
         return Math.floor(time / 1000);
     }
 }
