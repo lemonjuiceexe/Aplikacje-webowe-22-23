@@ -10,6 +10,7 @@ const timeLabel = document.querySelector(".time");
 
 const margin = 10;
 const boxSize = 20;
+const mapSizeLimit = 30;
 
 let firstClick = true;
 let startTime, currTime;
@@ -22,8 +23,6 @@ let mineNeighbours = [];
 let allTiles = [];
 let timer;
 let nickname;
-
-//TODO: Don't allow clicking after the win/lose
 
 let game = {
     //Variables and consts
@@ -44,11 +43,19 @@ let game = {
         startTime = new Date();
     },
 
-    //TODO: Validate input (mines < rows * cols) and rows < x and columns < x
     readInput : () => {
         y = rEl.value; x = cEl.value;
         mines = mEl.value;
         nickname = nEl.value;
+
+        //Validating input
+        if (nickname == "") { nickname = "Anonymous"; }
+        if (x > mapSizeLimit) { x = mapSizeLimit; }
+        if (y > mapSizeLimit) { y = mapSizeLimit; }
+        if (mines >= x * y) { mines = x * y - 1; }
+
+        rEl.value = x; cEl.value = y; mEl.value = mines;
+
         x++; y++;
         for(let i = 0; i < y - 1; i++){
             map[i] = [];
@@ -179,6 +186,7 @@ sbm.addEventListener("click", () => {
 });
 //Clicking on canvas
 canvas.addEventListener("click", (e) => {
+    if(!countTime) { return; } //Don't allow clicking before and after the game
     let x = Math.floor((e.offsetX - margin) / boxSize);
     let y = Math.floor((e.offsetY - margin) / boxSize);
 
