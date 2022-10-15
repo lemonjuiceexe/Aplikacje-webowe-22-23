@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 const rEl = document.querySelector("#rows");
 const cEl = document.querySelector("#cols");
 const mEl = document.querySelector("#mines");
+const nEl = document.querySelector("#nickname");
 const sbm = document.querySelector("button");
 const timeLabel = document.querySelector(".time");
 
@@ -20,9 +21,9 @@ let map = [];
 let mineNeighbours = [];
 let allTiles = [];
 let timer;
+let nickname;
 
 //TODO: Don't allow clicking after the win/lose
-//TODO: Check if cookies have path and expire time
 
 let game = {
     //Variables and consts
@@ -47,6 +48,7 @@ let game = {
     readInput : () => {
         y = rEl.value; x = cEl.value;
         mines = mEl.value;
+        nickname = nEl.value;
         x++; y++;
         for(let i = 0; i < y - 1; i++){
             map[i] = [];
@@ -119,35 +121,39 @@ let game = {
             alert(`You won in ${ Utils.formatTime(currTime) } seconds!`);
             
             bestTimes = Utils.getBestTimes(x, y, mines);
-            currTime = Number(currTime);
-            if(bestTimes == undefined){ 
+            let currScore = new Score(Number(currTime), nickname);
+            // currTime = Number(currTime);
+            if(bestTimes == "[]"){ 
                 bestTimes = [];
-                bestTimes.push(currTime);
+                bestTimes.push(currScore);
             }
             else if(bestTimes.length < 10){
-                bestTimes.push(currTime);
+                bestTimes.push(currScore);
             }
             else{
-                if(bestTimes[9] > currTime){
-                    bestTimes[9] = currTime;
+                if(bestTimes[9].time > currScore.time){
+                    bestTimes[9] = currScore;
                 }
             }
-            bestTimes = bestTimes.sort((a, b) => a - b);
-            Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimes, 365);
+            console.log(bestTimes);
+            bestTimes = bestTimes.sort((a, b) => a.time - b.time);
+            bestTimesString = JSON.stringify(bestTimes);
+            // console.log("PUSHING " + bestTimesString);
+            Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimesString, 365);
 
             game.displayScores(bestTimes);
         }
     },
 
     displayScores : (bestTimes) => {
-        console.log("DISPLAY");
         let scores = document.querySelectorAll(".scores > *");
+
         scores.forEach((el, i) => { 
             if(bestTimes[i] != undefined){
-                el.innerHTML = `<strong>${bestTimes[i]} ms</strong>`;
+                el.innerHTML = `<strong>${bestTimes[i].name} ${bestTimes[i].time} ms</strong>`;
             }
             else{
-                el.innerHTML = "-- ms";
+                el.innerHTML = "-- -- ms";
             }
         });
     },
@@ -208,6 +214,13 @@ canvas.addEventListener("contextmenu", (e) => {
     console.log(x, y);
     map[y][x].flagToggle();
 });
+
+class Score{
+    constructor(time, name){
+        this.time = time;
+        this.name = name;
+    }
+}
 
 class Box{
     constructor(x, y){
@@ -342,13 +355,21 @@ class Utils{
 
     static getBestTimes(_x, _y, _m){ // Return best times for the given map (_x x _y with _m mines)
         //Get best times from cookies as string/empty array
-        let temp = Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, []);
-        let bestTimes = temp.length > 0 ? temp.split(",") : [];
-        // Cast array to int
-        for(let i = 0; i < bestTimes.length; i++){
-            bestTimes[i] = Number(bestTimes[i]);
-        }
+        // let temp = Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, {});
+        // // let bestTimes = temp != "" ? temp.split(",") : [];
 
+        // // let bestTimes = [];
+        // console.log("READ FROM COOKIES ", temp);
+        // let bestTimes = JSON.parse(temp);
+
+        // Cast array to int
+        // for(let i = 0; i < temp.length; i++){
+        //     bestTimes.push(JSON.parse(temp[i]));
+        // }
+        // for(let i = 0; i < temp.length; i++){
+        //     bestTimes[i].time = Number(temp[i].time);
+        // }
+        let bestTimes = JSON.parse(Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, "[]"));
         return bestTimes;
     }
 
