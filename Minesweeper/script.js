@@ -7,6 +7,7 @@ const mEl = document.querySelector("#mines");
 const nEl = document.querySelector("#nickname");
 const sbm = document.querySelector("button");
 const timeLabel = document.querySelector(".time");
+const minesLeftLabel = document.querySelector(".mines-left");
 
 const margin = 10;
 const boxSize = 20;
@@ -15,15 +16,17 @@ const mapSizeLimit = 30;
 let firstClick = true;
 let startTime, currTime;
 let countTime = false;
+let minesLeft = 0;
 
 let x, y;
-let mines;
+let mines = 0;
 let map = [];
 let mineNeighbours = [];
 let allTiles = [];
 let timer;
 let nickname;
 
+//TODO: make the whole thing pretty as hell
 let game = {
     //Variables and consts
     colors : { 
@@ -45,16 +48,17 @@ let game = {
 
     readInput : () => {
         y = rEl.value; x = cEl.value;
-        mines = mEl.value;
+        mines = Number(mEl.value);
         nickname = nEl.value;
 
         //Validating input
         if (nickname == "") { nickname = "Anonymous"; }
         if (x > mapSizeLimit) { x = mapSizeLimit; }
         if (y > mapSizeLimit) { y = mapSizeLimit; }
-        if (mines >= x * y) { mines = x * y - 1; }
+        if (mines + 1 >= x * y) { mines = x * y - 2; }
 
-        rEl.value = x; cEl.value = y; mEl.value = mines;
+        rEl.value = y; cEl.value = x; mEl.value = mines;
+        game.updateMinesLeft(mines);
 
         x++; y++;
         for(let i = 0; i < y - 1; i++){
@@ -104,6 +108,7 @@ let game = {
         }
     },
 
+    //TODO: probably need a proper reveal
     revealTheMap : () => { 
         allTiles.forEach(tile => {
             let _color;
@@ -149,12 +154,14 @@ let game = {
             Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimesString, 365);
 
             game.displayScores(bestTimes);
+            game.updateMinesLeft(0);
         }
     },
 
     displayScores : (bestTimes) => {
         let scores = document.querySelectorAll(".scores > *");
 
+        //TODO: dunno if there's need to display times in MM:SS.ms format
         scores.forEach((el, i) => { 
             if(bestTimes[i] != undefined){
                 el.innerHTML = `<strong>${bestTimes[i].name} ${bestTimes[i].time} ms</strong>`;
@@ -174,9 +181,20 @@ let game = {
         timer = setInterval(() => {
             if(countTime){
                 currTime = new Date() - startTime;
-                timeLabel.innerHTML = `Time: ${ Utils.formatTime(currTime) } s`;
+                timeLabel.innerText = `Time: ${ Utils.formatTime(currTime) } s`;
             }
         }, 300);
+    },
+
+    updateMinesLeft : (amount) => {
+        minesLeft = Number(amount);
+        if(minesLeft < 0 && countTime){
+            minesLeftLabel.innerText = `Mines left: ?`;
+            return;
+        }
+        minesLeftLabel.innerText = `Mines left: ${minesLeft}`;
+
+        console.log(minesLeftLabel.innerText);
     }
 }
 
@@ -241,6 +259,7 @@ class Box{
     
     colorHex = "#ffffff";
 
+    //TODO: need to change the system to images instead of colors
     color = (c) => {
         this.colorHex = c;
         ctx.fillStyle = c;
@@ -314,15 +333,18 @@ class Box{
         ctx.font = "20px Arial";
         ctx.fillText(count, this.boxX * boxSize + margin + 5, this.boxY * boxSize + margin + 17);
     }
+    //TODO: add mines left counter
     flagToggle = () => {
         if(!this.hidden) { return; }
         if(this.flag){
             this.color(game.colors.hidden);
             this.flag = false;
+            game.updateMinesLeft(minesLeft + 1);
         }
         else{
             this.color(game.colors.flag);
             this.flag = true;
+            game.updateMinesLeft(minesLeft - 1);
         }
     }
 }
@@ -362,23 +384,7 @@ class Utils{
     }
 
     static getBestTimes(_x, _y, _m){ // Return best times for the given map (_x x _y with _m mines)
-        //Get best times from cookies as string/empty array
-        // let temp = Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, {});
-        // // let bestTimes = temp != "" ? temp.split(",") : [];
-
-        // // let bestTimes = [];
-        // console.log("READ FROM COOKIES ", temp);
-        // let bestTimes = JSON.parse(temp);
-
-        // Cast array to int
-        // for(let i = 0; i < temp.length; i++){
-        //     bestTimes.push(JSON.parse(temp[i]));
-        // }
-        // for(let i = 0; i < temp.length; i++){
-        //     bestTimes[i].time = Number(temp[i].time);
-        // }
-        let bestTimes = JSON.parse(Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, "[]"));
-        return bestTimes;
+        return JSON.parse(Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, "[]"));
     }
 
     static formatTime = (time) => { 
