@@ -16,13 +16,14 @@ const mapSizeLimit = 30;
 let firstClick = true;
 let startTime, currTime;
 let countTime = false;
-let minesLeft = 0;
 
 let x, y;
 let mines = 0;
+let minesLeft = 0;
 let map = [];
 let mineNeighbours = [];
 let allTiles = [];
+let mineThatExploded = null;
 let timer;
 let nickname;
 
@@ -33,6 +34,7 @@ let game = {
         "hidden" : "img/hidden.png",
         "revealed" : "img/revealed.png",
         "mine" : "img/mine.png",
+        "mine-exploded" : "img/mine-exploded.png",
         "flag" : "img/flag.png",
         "mine-neighbour" : {
             1 : "img/1.png",
@@ -114,10 +116,6 @@ let game = {
         for(let drawI = margin; drawI < canvas.getAttribute("height") - (2 * margin) + 1; drawI += boxSize){
             for(let drawJ = margin; drawJ < canvas.getAttribute("width") - (2 * margin) + 1; drawJ += boxSize){
                 ctx.strokeRect(drawJ, drawI, boxSize, boxSize);
-                // Color the mines
-                // if(/*map[i][j] != undefined && */map[i][j].mine){
-                //     ctx.fillRect(drawJ, drawI, boxSize, boxSize);
-                // }
                 j++;
             }
             j = 0;
@@ -125,20 +123,16 @@ let game = {
         }
     },
 
-    //TODO: probably need a proper reveal
     revealTheMap : () => { 
+        console.log("imma reveal");
         allTiles.forEach(tile => {
             let path;
-            if(tile.mine){ 
+            if (tile.mine && tile == mineThatExploded) {
+                path = game.imgPaths["mine-exploded"];
+            }
+            else if(tile.mine){ 
                 path = game.imgPaths.mine;
             }
-            else if(tile.hidden){
-                path = game.imgPaths.hidden;
-            }
-            else{
-                path = game.imgPaths.revealed;
-            }
-            // tile.color(_color);
             tile.coverImage(path);
         });
     },
@@ -165,10 +159,8 @@ let game = {
                     bestTimes[9] = currScore;
                 }
             }
-            console.log(bestTimes);
             bestTimes = bestTimes.sort((a, b) => a.time - b.time);
             bestTimesString = JSON.stringify(bestTimes);
-            // console.log("PUSHING " + bestTimesString);
             Utils.setCookie(`bestTimes-${x-1}-${y-1}-${mines}`, bestTimesString, 365);
 
             game.displayScores(bestTimes);
@@ -211,8 +203,6 @@ let game = {
             return;
         }
         minesLeftLabel.innerText = `Mines left: ${minesLeft}`;
-
-        console.log(minesLeftLabel.innerText);
     }
 }
 
@@ -231,6 +221,7 @@ canvas.addEventListener("click", (e) => {
     map[y][x].click();
     // When mine clicked (Lose the game)
     if(map[y][x].mine && !firstClick){
+        mineThatExploded = map[y][x];
         //Reveal the map
         game.revealTheMap();
         countTime = false;
@@ -251,8 +242,9 @@ canvas.addEventListener("click", (e) => {
     game.checkWin();
 });
 //Right click
-canvas.addEventListener("contextmenu", (e) => { 
+canvas.addEventListener("contextmenu", (e) => {
     e.preventDefault();
+    if(!countTime) { return; } //Don't allow clicking before and after the game
     let x = Math.floor((e.offsetX - margin) / boxSize);
     let y = Math.floor((e.offsetY - margin) / boxSize);
     console.log(x, y);
@@ -285,10 +277,8 @@ class Box{
     }
     coverImage = (path) => {
         let img = new Image();
-        console.log(img);
         img.src = path;
         img.addEventListener("load", () => { 
-            console.log("load!"); 
             ctx.drawImage(img, this.boxX * boxSize + margin + 1, this.boxY * boxSize + margin + 1, boxSize - 2, boxSize - 2); 
         });
     }
@@ -310,6 +300,7 @@ class Box{
         this.revealNeighbours();
     }
 
+    //TODO: probably the flags should be ommited
     revealNeighbours = () => {
         //Mark the box as revealed
         if(!this.hidden) { return; }
