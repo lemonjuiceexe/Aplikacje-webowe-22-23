@@ -29,13 +29,24 @@ let nickname;
 //TODO: make the whole thing pretty as hell
 let game = {
     //Variables and consts
-    colors : { 
-        "hidden" : "#fff",
+    imgPaths : { 
+        "hidden" : "img/hidden.png",
+        "revealed" : "img/revealed.png",
+        "mine" : "img/mine.png",
+        "flag" : "img/flag.png",
+        "mine-neighbour" : {
+            1 : "img/1.png",
+            2 : "img/2.png",
+            3 : "img/3.png",
+            4 : "img/4.png",
+            5 : "img/5.png",
+            6 : "img/6.png",
+            7 : "img/7.png",
+            8 : "img/8.png"
+        },
+    },
+    colors : {
         "border" : "#1a1a1a",
-        "revealed" : "#2891fa",
-        "mine" : "#fa285c",
-        "mine-neighbour" : "#ffa142",
-        "flag" : "#10c964",
     },
     //Functions
     clearVars : () => { 
@@ -88,11 +99,17 @@ let game = {
         }
         //Draw the map
         //Background
-        ctx.fillStyle = game.colors.hidden;
-        ctx.fillRect(0 + margin, 0 + margin, canvas.width - 2 * margin, canvas.height - 2 * margin);
+        // ctx.fillStyle = game.colors.hidden;
+        // ctx.fillRect(0 + margin, 0 + margin, canvas.width - 2 * margin, canvas.height - 2 * margin);
+        //Instead of fillRect, insert images of hidden tiles
+        for(let i = 0; i < y - 1; i++){
+            for(let j = 0; j < x - 1; j++){
+                map[i][j].coverImage(game.imgPaths.hidden);
+            }
+        }
         //Borders and mines
         ctx.strokeStyle = game.colors.border;
-        ctx.fillStyle = game.colors.mine;
+        // ctx.fillStyle = game.colors.mine;
         let i = 0, j = 0;
         for(let drawI = margin; drawI < canvas.getAttribute("height") - (2 * margin) + 1; drawI += boxSize){
             for(let drawJ = margin; drawJ < canvas.getAttribute("width") - (2 * margin) + 1; drawJ += boxSize){
@@ -111,17 +128,18 @@ let game = {
     //TODO: probably need a proper reveal
     revealTheMap : () => { 
         allTiles.forEach(tile => {
-            let _color;
+            let path;
             if(tile.mine){ 
-                _color = game.colors.mine;
+                path = game.imgPaths.mine;
             }
             else if(tile.hidden){
-                _color = game.colors.hidden;
+                path = game.imgPaths.hidden;
             }
             else{
-                _color = game.colors.revealed;
+                path = game.imgPaths.revealed;
             }
-            tile.color(_color);
+            // tile.color(_color);
+            tile.coverImage(path);
         });
     },
 
@@ -259,18 +277,27 @@ class Box{
     
     colorHex = "#ffffff";
 
-    //TODO: need to change the system to images instead of colors
     color = (c) => {
         this.colorHex = c;
         ctx.fillStyle = c;
         // +1 and -2 are to compensate for the border
         ctx.fillRect(this.boxX * boxSize + margin + 1, this.boxY * boxSize + margin + 1, boxSize - 2, boxSize - 2);
     }
+    coverImage = (path) => {
+        let img = new Image();
+        console.log(img);
+        img.src = path;
+        img.addEventListener("load", () => { 
+            console.log("load!"); 
+            ctx.drawImage(img, this.boxX * boxSize + margin + 1, this.boxY * boxSize + margin + 1, boxSize - 2, boxSize - 2); 
+        });
+    }
 
     //Color the box and reveal the neighbours if no mines are around
     click = () => {
         if(!mineNeighbours.includes(this)){
-            this.color(game.colors.revealed);
+            // this.color(game.colors.revealed);
+            this.coverImage(game.imgPaths.revealed);
         }
         else{ 
             this.colorNumbered();
@@ -300,7 +327,8 @@ class Box{
             if(box.mine){ return; }
             //Color both normal and numbered squares
             if(!mineNeighbours.includes(box)){
-                box.color(game.colors.revealed);
+                // box.color(game.colors.revealed);
+                box.coverImage(game.imgPaths.revealed);
             }
             else{ 
                 box.hidden = false;
@@ -328,21 +356,24 @@ class Box{
     colorNumbered = () => {
         let neighbouring = this.neighbours();
         let count = neighbouring.filter((box) => box.mine).length;
-        this.color(game.colors["mine-neighbour"]);
-        ctx.fillStyle = "#000000";
-        ctx.font = "20px Arial";
-        ctx.fillText(count, this.boxX * boxSize + margin + 5, this.boxY * boxSize + margin + 17);
+        let path = `./img/${count}.png`;
+        this.coverImage(path);
+        // this.color(game.colors["mine-neighbour"]);
+        // ctx.fillStyle = "#000000";
+        // ctx.font = "20px Arial";
+        // ctx.fillText(count, this.boxX * boxSize + margin + 5, this.boxY * boxSize + margin + 17);
     }
-    //TODO: add mines left counter
     flagToggle = () => {
         if(!this.hidden) { return; }
         if(this.flag){
-            this.color(game.colors.hidden);
+            // this.color(game.colors.hidden);
+            this.coverImage(game.imgPaths.hidden);
             this.flag = false;
             game.updateMinesLeft(minesLeft + 1);
         }
         else{
-            this.color(game.colors.flag);
+            // this.color(game.colors.flag);
+            this.coverImage(game.imgPaths.flag);
             this.flag = true;
             game.updateMinesLeft(minesLeft - 1);
         }
