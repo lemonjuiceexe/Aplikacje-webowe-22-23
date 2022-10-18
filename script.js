@@ -113,15 +113,14 @@ let game = {
         }
         //Borders and mines
         ctx.strokeStyle = game.colors.border;
-        // ctx.fillStyle = game.colors.mine;
-        let i = 0, j = 0;
+        // let i = 0, j = 0;
         for(let drawI = margin; drawI < canvas.getAttribute("height") - (2 * margin) + 1; drawI += boxSize){
             for(let drawJ = margin; drawJ < canvas.getAttribute("width") - (2 * margin) + 1; drawJ += boxSize){
                 ctx.strokeRect(drawJ, drawI, boxSize, boxSize);
-                j++;
+                // j++;
             }
-            j = 0;
-            i++;
+            // j = 0;
+            // i++;
         }
     },
 
@@ -329,12 +328,13 @@ class Box{
             if(!box.hidden){ return; }
             //Don't reveal a mine
             if(box.mine){ return; }
+            //Unflag the box if it's flagged
+            if(box.flag){ box.flagToggle(false); console.log("unflag m8"); }
             //Color both normal and numbered squares
             if(!mineNeighbours.includes(box)){
-                // box.color(game.colors.revealed);
                 box.coverImage(game.imgPaths.revealed);
             }
-            else{ 
+            else{
                 box.hidden = false;
                 box.colorNumbered();
             }
@@ -372,15 +372,19 @@ class Box{
         let path = game.imgPaths["mine-neighbour"][count];
         this.coverImage(path);
     }
-    flagToggle = () => {
+    flagToggle = (updateImage = true) => {
         if(!this.hidden) { return; }
         if(this.flag){
-            this.coverImage(game.imgPaths.hidden);
+            if(updateImage){
+                this.coverImage(game.imgPaths.hidden);
+            }
             this.flag = false;
             game.updateMinesLeft(minesLeft + 1);
         }
         else{
-            this.coverImage(game.imgPaths.flag);
+            if(updateImage){
+                this.coverImage(game.imgPaths.flag);
+            }
             this.flag = true;
             game.updateMinesLeft(minesLeft - 1);
         }
