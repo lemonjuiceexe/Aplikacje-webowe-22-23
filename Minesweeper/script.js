@@ -10,7 +10,7 @@ const timeLabel = document.querySelector(".time");
 const minesLeftLabel = document.querySelector(".mines-left");
 
 const margin = 10;
-const boxSize = 20;
+const boxSize = 40;
 const mapSizeLimit = 30;
 
 let firstClick = true;
@@ -31,24 +31,25 @@ let nickname;
 let game = {
     //Variables and consts
     imgPaths : { 
-        "hidden" : "img/hidden.png",
-        "revealed" : "img/revealed.png",
-        "mine" : "img/mine.png",
-        "mine-exploded" : "img/mine-exploded.png",
-        "flag" : "img/flag.png",
+        "hidden" : "img/hidden-c.png",
+        "revealed" : "img/revealed-c.png",
+        "mine" : "img/mine-c.png",
+        "mine-exploded" : "img/mine-exploded-c.png",
+        "flag" : "img/flag-c.png",
         "mine-neighbour" : {
-            1 : "img/1.png",
-            2 : "img/2.png",
-            3 : "img/3.png",
-            4 : "img/4.png",
-            5 : "img/5.png",
-            6 : "img/6.png",
-            7 : "img/7.png",
-            8 : "img/8.png"
+            1 : "img/1-c.png",
+            2 : "img/2-c.png",
+            3 : "img/3-c.png",
+            4 : "img/4-c.png",
+            5 : "img/5-c.png",
+            6 : "img/6-c.png",
+            7 : "img/7-c.png",
+            8 : "img/8-c.png"
         },
     },
     colors : {
-        "border" : "#1a1a1a",
+        border: "#FFCACA",
+        // "border" : "#1a1a1a",
     },
     //Functions
     clearVars : () => { 
@@ -81,8 +82,8 @@ let game = {
             }
         }
         //Resize canvas
-        canvas.width = x * boxSize; 
-        canvas.height = y * boxSize;
+        canvas.width = (x - 1) * boxSize + margin * 2;; 
+        canvas.height = (y - 1) * boxSize + margin * 2;
     },
     generateMap : () => {
         allTiles = [].concat(...map);
@@ -124,7 +125,6 @@ let game = {
     },
 
     revealTheMap : () => { 
-        console.log("imma reveal");
         allTiles.forEach(tile => {
             let path;
             if (tile.mine && tile == mineThatExploded) {
@@ -171,7 +171,7 @@ let game = {
     displayScores : (bestTimes) => {
         let scores = document.querySelectorAll(".scores > *");
 
-        //TODO: dunno if there's need to display times in MM:SS.ms format
+        //TODO: dunno if there's a need to display times in MM:SS.ms format
         scores.forEach((el, i) => { 
             if(bestTimes[i] != undefined){
                 el.innerHTML = `<strong>${bestTimes[i].name} ${bestTimes[i].time} ms</strong>`;
@@ -300,7 +300,7 @@ class Box{
         this.revealNeighbours();
     }
 
-    //TODO: probably the flags should be ommited
+    //TODO: Consider the fact that now the flag counter breaks when you reveal a flagged tile. 
     revealNeighbours = () => {
         //Mark the box as revealed
         if(!this.hidden) { return; }
@@ -347,7 +347,7 @@ class Box{
     colorNumbered = () => {
         let neighbouring = this.neighbours();
         let count = neighbouring.filter((box) => box.mine).length;
-        let path = `./img/${count}.png`;
+        let path = game.imgPaths["mine-neighbour"][count];
         this.coverImage(path);
         // this.color(game.colors["mine-neighbour"]);
         // ctx.fillStyle = "#000000";
