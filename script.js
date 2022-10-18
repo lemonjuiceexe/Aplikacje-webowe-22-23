@@ -50,7 +50,6 @@ let game = {
     },
     colors : {
         border: "#FFCACA",
-        // "border" : "#1a1a1a",
     },
     //Functions
     clearVars : () => { 
@@ -70,7 +69,11 @@ let game = {
         if (nickname == "") { nickname = "Anonymous"; }
         if (x > mapSizeLimit) { x = mapSizeLimit; }
         if (y > mapSizeLimit) { y = mapSizeLimit; }
+        if (x < 1) { x = 1; }
+        if (y < 1) { y = 1; }
+        
         if (mines + 1 >= x * y) { mines = x * y - 2; }
+        if (mines < 2) { mines = 2; }
 
         rEl.value = y; cEl.value = x; mEl.value = mines;
         game.updateMinesLeft(mines);
@@ -146,7 +149,7 @@ let game = {
         if(revealed.length == allTiles.length - mines){
             countTime = false;
             game.revealTheMap();
-            alert(`You won in ${ Utils.formatTime(currTime) } seconds!`);
+            alert(`You won in ${ Utils.milisecondsToFormatted(currTime) } seconds!`);
             
             bestTimes = Utils.getBestTimes(x, y, mines);
             let currScore = new Score(Number(currTime), nickname);
@@ -178,7 +181,7 @@ let game = {
         //TODO: dunno if there's a need to display times in MM:SS.ms format
         scores.forEach((el, i) => { 
             if(bestTimes[i] != undefined){
-                el.innerHTML = `<strong>${bestTimes[i].name} ${bestTimes[i].time} ms</strong>`;
+                el.innerHTML = `<strong>${bestTimes[i].name} ${Utils.milisecondsToFormatted(bestTimes[i].time)} ms</strong>`;
             }
             else{
                 el.innerHTML = "-- -- ms";
@@ -195,7 +198,7 @@ let game = {
         timer = setInterval(() => {
             if(countTime){
                 currTime = new Date() - startTime;
-                timeLabel.innerText = `Time: ${ Utils.formatTime(currTime) } s`;
+                timeLabel.innerText = `Time: ${ Utils.milisecondsToSeconds(currTime) } s`;
             }
         }, 300);
     },
@@ -228,7 +231,8 @@ canvas.addEventListener("click", (e) => {
         //Reveal the map
         game.revealTheMap();
         countTime = false;
-        alert(`Game Over. You lost in ${ Utils.formatTime(currTime) } seconds.`);
+        // alert(`Game Over. You lost in ${ Utils.milisecondsToSeconds(currTime) } seconds.`);
+        alert(`Game Over. You lost in ${ Utils.milisecondsToFormatted(currTime) }.`);
         return;
     }
     // Regenerate if first click is a mine
@@ -312,7 +316,6 @@ class Box{
         this.revealNeighbours();
     }
 
-    //TODO: Consider the fact that now the flag counter breaks when you reveal a flagged tile. 
     revealNeighbours = () => {
         //Mark the box as revealed
         if(!this.hidden) { return; }
@@ -429,8 +432,20 @@ class Utils{
         return JSON.parse(Utils.getCookie(`bestTimes-${_x-1}-${_y-1}-${_m}`, "[]"));
     }
 
-    static formatTime = (time) => { 
+    static milisecondsToSeconds = (time) => { 
         if(isNaN(Math.floor(time / 1000))) { return 0;}
         return Math.floor(time / 1000);
+    }
+    //Return the time in the format mm:ss:ms
+    static milisecondsToFormatted = (time) => {
+        let miliseconds = time % 1000;
+        let seconds = Utils.milisecondsToSeconds(time);
+        let minutes = Math.floor(seconds / 60);
+        seconds = seconds % 60;
+
+        minutes = String(minutes).padStart(2, "0");
+        seconds = String(seconds).padStart(2, "0");
+
+        return `${minutes}:${seconds}:${miliseconds}`;
     }
 }
