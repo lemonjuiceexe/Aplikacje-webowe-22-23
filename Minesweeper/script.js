@@ -23,6 +23,7 @@ let minesLeft = 0;
 let map = [];
 let mineNeighbours = [];
 let allTiles = [];
+let notMines = [];
 let mineThatExploded = null;
 let timer;
 let nickname;
@@ -92,7 +93,7 @@ let game = {
         while(mineCount < mines){
             let a = Math.floor(Math.random() * (y - 1));
             let b = Math.floor(Math.random() * (x - 1));
-            if(/*map[a][b] && */map[a][b].mine){
+            if(map[a][b].mine){
                 continue;
             }
             // map[a][b] = new Box();
@@ -100,11 +101,11 @@ let game = {
             mineCount++;
             map[a][b].neighbours().forEach(el => mineNeighbours.push(el));
         }
+
+        notMines = allTiles.filter(el => !el.mine);
+
         //Draw the map
         //Background
-        // ctx.fillStyle = game.colors.hidden;
-        // ctx.fillRect(0 + margin, 0 + margin, canvas.width - 2 * margin, canvas.height - 2 * margin);
-        //Instead of fillRect, insert images of hidden tiles
         for(let i = 0; i < y - 1; i++){
             for(let j = 0; j < x - 1; j++){
                 map[i][j].coverImage(game.imgPaths.hidden);
@@ -126,12 +127,16 @@ let game = {
 
     revealTheMap : () => { 
         allTiles.forEach(tile => {
-            let path;
+            let path = game.imgPaths.hidden;
             if (tile.mine && tile == mineThatExploded) {
+                tile.hidden = true;
                 path = game.imgPaths["mine-exploded"];
             }
             else if(tile.mine){ 
                 path = game.imgPaths.mine;
+            }
+            else if(!tile.hidden){
+                path = "";
             }
             tile.coverImage(path);
         });
@@ -218,7 +223,6 @@ canvas.addEventListener("click", (e) => {
 
     if(map[y][x].flag) { return; }
 
-    map[y][x].click();
     // When mine clicked (Lose the game)
     if(map[y][x].mine && !firstClick){
         mineThatExploded = map[y][x];
@@ -231,14 +235,24 @@ canvas.addEventListener("click", (e) => {
     // Regenerate if first click is a mine
     else if(firstClick){
         while(map[y][x].mine){
-            game.clearVars();
-            game.readInput();
-            game.generateMap();
+            // game.clearVars();
+            // game.readInput();
+            // game.generateMap();
+
+            map[y][x].mine = false;
+            notMines[0].mine = true;
+            notMines.shift();
+
+            //Regenerate the mine neighbours array
+            console.log("Updating the thing");
+            mineNeighbours = [];
+            allTiles.filter(el => el.mine).forEach(el => mineNeighbours.push(...el.neighbours(false)));
         }
         firstClick = false;
         map[y][x].click();
     }
 
+    map[y][x].click();
     game.checkWin();
 });
 //Right click
@@ -286,7 +300,6 @@ class Box{
     //Color the box and reveal the neighbours if no mines are around
     click = () => {
         if(!mineNeighbours.includes(this)){
-            // this.color(game.colors.revealed);
             this.coverImage(game.imgPaths.revealed);
         }
         else{ 
@@ -333,14 +346,23 @@ class Box{
     }
 
     //Return the eight neighbouring boxes
-    neighbours = () => {
+    neighbours = (onlyNotRevealed = true) => {
         return allTiles.filter((box) => {
-                    //Not yet revealed and not the same box
-            return box.hidden && !(box.boxX == this.boxX && box.boxY == this.boxY)
-                //Tiles neighbouring by x
-                && ((box.boxX == this.boxX - 1 || box.boxX == this.boxX || box.boxX == this.boxX + 1)
+            if(onlyNotRevealed){
+                        //Not yet revealed and not the same box
+                return box.hidden && !(box.boxX == this.boxX && box.boxY == this.boxY)
+                    //Tiles neighbouring by x
+                    && ((box.boxX == this.boxX - 1 || box.boxX == this.boxX || box.boxX == this.boxX + 1)
                     //Tiles neighbouring by y
                     && (box.boxY == this.boxY - 1 || box.boxY == this.boxY || box.boxY == this.boxY + 1));
+            }
+            else{
+                return !(box.boxX == this.boxX && box.boxY == this.boxY)
+                    //Tiles neighbouring by x
+                    && ((box.boxX == this.boxX - 1 || box.boxX == this.boxX || box.boxX == this.boxX + 1)
+                    //Tiles neighbouring by y
+                    && (box.boxY == this.boxY - 1 || box.boxY == this.boxY || box.boxY == this.boxY + 1));
+            }
         });
     }
     //Color the numbered box (count it's mine neighbours)
@@ -349,21 +371,15 @@ class Box{
         let count = neighbouring.filter((box) => box.mine).length;
         let path = game.imgPaths["mine-neighbour"][count];
         this.coverImage(path);
-        // this.color(game.colors["mine-neighbour"]);
-        // ctx.fillStyle = "#000000";
-        // ctx.font = "20px Arial";
-        // ctx.fillText(count, this.boxX * boxSize + margin + 5, this.boxY * boxSize + margin + 17);
     }
     flagToggle = () => {
         if(!this.hidden) { return; }
         if(this.flag){
-            // this.color(game.colors.hidden);
             this.coverImage(game.imgPaths.hidden);
             this.flag = false;
             game.updateMinesLeft(minesLeft + 1);
         }
         else{
-            // this.color(game.colors.flag);
             this.coverImage(game.imgPaths.flag);
             this.flag = true;
             game.updateMinesLeft(minesLeft - 1);
