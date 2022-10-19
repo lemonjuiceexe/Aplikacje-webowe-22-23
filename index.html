@@ -5,35 +5,46 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Minesweeper</title>
 
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="css/style.css">
     <script src="script.js" defer></script>
 </head>
 
 <body>
-    <label for="rows">Rows&nbsp;</label><input type="number" id="rows" min="0" max="100" value="20"><br>
-    <label for="cols">Columns&nbsp;</label><input type="number" id="cols" min="0" max="100" value="20"><br>
-    <label for="mines">Mines&nbsp;</label><input type="number" id="mines" min="1" max="46" value="5"><br>
-    <label for="nickname">Nickname&nbsp;</label><input type="text" id="nickname" maxlength="10" value="Player"><br>
-    <button>Confirm</button>
-    <p class="time">Time: 0s</p>
-    <p class="mines-left">Mines left: 0</p>
-    <br><br>
-    <canvas height="400" width="400" style="border: 1px solid black;"></canvas>
-    <h2 class="score-label">Top 10 best times in this category</h2>
-    <ol class="scores">
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-        <li>-- ms</li>
-    </ol>
+    <div class="wrapper">
+        <h1>Minesweeper</h1>
+        <div class="form">
+            <div><label for="nickname">Nickname&nbsp;</label><input class="pulse" type="text" id="nickname" maxlength="10" value="Player"></div>
+            <div><label for="rows">Rows&nbsp;</label><input class="pulse" type="number" id="rows" min="0" max="100" value="20"></div>
+            <div><label for="cols">Columns&nbsp;</label><input class="pulse" type="number" id="cols" min="0" max="100" value="20"></div>
+            <div><label for="mines">Mines&nbsp;</label><input class="pulse" type="number" id="mines" min="1" max="46" value="5"></div><br>
+            <button class="pulse">Confirm</button>    
+        </div>
+        <section>
+            <div class="stats">
+                <p class="time">Time: 0s</p>
+                <p class="mines-left">Mines left: 0</p>    
+            </div>
+            <canvas height="400" width="400"></canvas>
+        </section>
+        <div>
+            <h2 class="score-label">Top 10 best times in this category</h2>
+            <ol class="scores">
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+                <li>-- ms</li>
+            </ol>
+        </div>
+    </div>
 </body>
 
 </html>
