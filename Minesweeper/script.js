@@ -28,7 +28,6 @@ let mineThatExploded = null;
 let timer;
 let nickname;
 
-//TODO: make the whole thing pretty as hell
 let game = {
     //Variables and consts
     imgPaths : { 
@@ -66,7 +65,7 @@ let game = {
         nickname = nEl.value;
 
         //Validating input
-        if (nickname == "") { nickname = "Anonymous"; }
+        if (nickname == "" || !nickname.match(/^[a-zA-Z0-9]+$/)) { nickname = "Anonymous"; }
         if (x > mapSizeLimit) { x = mapSizeLimit; }
         if (y > mapSizeLimit) { y = mapSizeLimit; }
         if (x < 1) { x = 1; }
@@ -78,7 +77,7 @@ let game = {
         //Round the input values
         x = Math.round(x); y = Math.round(y); mines = Math.round(mines);
 
-        rEl.value = y; cEl.value = x; mEl.value = mines;
+        rEl.value = y; cEl.value = x; mEl.value = mines; nEl.value = nickname;
         game.updateMinesLeft(mines);
 
         x++; y++;
@@ -181,7 +180,6 @@ let game = {
     displayScores : (bestTimes) => {
         let scores = document.querySelectorAll(".scores > *");
 
-        //TODO: dunno if there's a need to display times in MM:SS.ms format
         scores.forEach((el, i) => { 
             if(bestTimes[i] != undefined){
                 el.innerHTML = `<strong>${bestTimes[i].name} ${Utils.milisecondsToFormatted(bestTimes[i].time)} ms</strong>`;
