@@ -1,2 +1,4 @@
 .vscode/
 .DS_Store
+Fridge/node_modules/
+Fridge/dist/
