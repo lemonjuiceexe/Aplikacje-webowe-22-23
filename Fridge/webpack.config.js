@@ -20,7 +20,8 @@ module.exports = {
 
     entry: {
       index: './src/index.ts',
-      board: './src/board.ts'
+      board: './src/board.ts',
+      boardIndex: './src/boardIndex.ts',
     },
     output: {
         filename: '[name].bundle.js',
