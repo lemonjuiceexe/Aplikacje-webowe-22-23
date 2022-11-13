@@ -9,4 +9,4 @@ console.log("ahjs");
 
 const board = new Board(wrapper, counterAll, counterActive);
 
-addNoteButton.addEventListener("click", board.addNote.bind(board, "Tytuł notatki", "Treść notatki", {x: 50, y: 50}, {width: 50, height: 50}));
+addNoteButton.addEventListener("click", board.addNote.bind(board, "Tytuł notatki", "Treść notatki"));

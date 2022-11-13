@@ -25,36 +25,44 @@ export class Board{
     }
     
     /*Public methods */
-    public addNote(title: string, content: string, position: {x: number, y: number} = this.defaultNotePosition, size: {width: number, height: number} = this.defaultNoteSize){
-        const noteElement = this.createNoteElement(title, content);
-        noteElement.style.left = position.x + "px";
-        noteElement.style.top = position.y + "px";
+    public addNote(title: string, content: string){
+        // position = this.defaultNotePosition;
+        const position = {...this.defaultNotePosition};
+        const size = {...this.defaultNoteSize};
+        
+        const noteElement = this.createNoteElement(this.allCount, title, content);
+        noteElement.style.left = this.defaultNotePosition.x + "px";
+        noteElement.style.top = this.defaultNotePosition.y + "px";
         this.wrapper.appendChild(noteElement);
         
         // Logic
-        let note = new Note(noteElement, this.allCount, title, position, size, content);
+        let note = new Note(this, noteElement, this.allCount, title, position, size, content);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
     }
     public removeNote(note: Note){
-        this.notes = this.notes.filter(el => el != note);
-        this.updateCounters(Boolean(-1));
+        this.notes = this.notes.filter(el => el.id != note.id);
+        this.updateCounters(Boolean(0));
 
-        /*TODO: remove DOM element from wrapper */
+        const noteToRemove = this.wrapper.querySelector("#note-" + note.id);
+        if(noteToRemove) { this.wrapper.removeChild(noteToRemove); }
+        else { console.error("Note with id " + note.id + " not found"); return; }
+        console.log(this.notes);
     }
 
     /* Private methods */
     /* 1 - increase number of notes; 0 - decrease */
     private updateCounters(increase: boolean){
         this.activeCount = this.notes.length;
-        this.allCount += increase ? 1 : -1;
+        this.allCount += increase ? 1 : 0;
         this.counterAll.innerText = this.allCount.toString();
         this.counterActive.innerText = this.activeCount.toString();
     }
-    private createNoteElement(title: string, content: string){
+    private createNoteElement(id: number, title: string, content: string){
         // Create note HTML element structure
         const noteElement = document.createElement("div");
         noteElement.classList.add("note");
+        noteElement.id = "note-" + id;
         
         let dragzone = document.createElement("div");
         dragzone.classList.add("note-drag-zone");

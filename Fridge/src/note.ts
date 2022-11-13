@@ -1,4 +1,7 @@
+import { Board } from "./board";
+
 export class Note{
+    public readonly board: Board;
     public readonly id: number;
     public title: string;
     public content: string = "";
@@ -7,8 +10,10 @@ export class Note{
 
     public noteElement: HTMLDivElement;
     private dragzone: HTMLElement;
+    private closeButton: HTMLElement;
 
-    constructor(noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, content: string = ""){
+    constructor(board: Board, noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, content: string = ""){
+        this.board = board;
         this.noteElement = noteElement;
         
         this.id = id;
@@ -18,7 +23,9 @@ export class Note{
         this.size = size;
 
         this.dragzone = noteElement.querySelector(".note-drag-zone") as HTMLElement;
+        this.closeButton = noteElement.querySelector(".note-close") as HTMLElement;
         this.dragzone.addEventListener("mousedown", this.dragStart.bind(this));
+        this.closeButton.addEventListener("mousedown", () => board.removeNote(this));
     }
 
     private dragStart(e: MouseEvent){
