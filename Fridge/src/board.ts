@@ -6,7 +6,6 @@ import { Note } from "./note";
 export class Board{
     /* References to HTML elements in a board */
     private wrapper: HTMLDivElement;
-    private addNoteButton: HTMLDivElement;
     private counterAll: HTMLSpanElement;
     private counterActive: HTMLSpanElement;
 
@@ -19,9 +18,8 @@ export class Board{
     private allCount: number = 0;
     private activeCount: number = 0;
 
-    constructor(wrapper: HTMLDivElement, addNoteButton: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement){
+    constructor(wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement){
         this.wrapper = wrapper;
-        this.addNoteButton = addNoteButton;
         this.counterAll = counterAll;
         this.counterActive = counterActive;
     }
@@ -50,6 +48,8 @@ export class Board{
     private updateCounters(increase: boolean){
         this.activeCount = this.notes.length;
         this.allCount += increase ? 1 : -1;
+        this.counterAll.innerText = this.allCount.toString();
+        this.counterActive.innerText = this.activeCount.toString();
     }
     private createNoteElement(title: string, content: string){
         // Create note HTML element structure

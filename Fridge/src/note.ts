@@ -19,7 +19,6 @@ export class Note{
 
         this.dragzone = noteElement.querySelector(".note-drag-zone") as HTMLElement;
         this.dragzone.addEventListener("mousedown", this.dragStart.bind(this));
-        // this.dragzone.onmousedown = this.dragStart.bind(this);
     }
 
     private dragStart(e: MouseEvent){
@@ -52,17 +51,4 @@ export class Note{
         document.addEventListener("mousemove", drag);
         document.addEventListener("mouseup", dragEnd);
     }
-    // private drag(e: MouseEvent){
-    //     let oX = this.position.x - e.clientX;
-    //     let oY = this.position.y - e.clientY;
-    //     this.position.x = e.clientX;
-    //     this.position.y = e.clientY;
-    //     this.noteElement.style.left = (this.position.x - oX) + "px";
-    //     this.noteElement.style.top = (this.position.y - oY) + "px";
-    // }
-    // private dragEnd(e: MouseEvent){
-    //     console.log("END :( ", this);
-    //     document.onmouseup = null;
-    //     document.onmousedown = null;
-    // }
 }

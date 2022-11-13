@@ -65,6 +65,8 @@
     left: 300px; top: 300px;
     width: 200px;
     height: 200px;
+    min-width: 150px;
+    min-height: 2em;
     border: 2px solid var(--color-6);
     border-radius: 5px;
     background-color: var(--color-2);
