@@ -112,10 +112,11 @@ body{
 .note-moving{
     background-color: var(--color-3);
 }
-textarea{
+.tox{
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
+    resize: vertical;
 }
 .tinymce-button-exit, .tinymce-button-save{
     display: inline-flex !important;

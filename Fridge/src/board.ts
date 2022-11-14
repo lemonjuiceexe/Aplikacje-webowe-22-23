@@ -2,8 +2,6 @@ import tinymce from "tinymce";
 import "./css/board.css";
 import { Note } from "./note";
 
-/*TODO: reorganise the files, so board.ts is a file for board class and some other files is to be included in board.html (probably change htmls name as well) */
-
 export class Board{
     /* References to HTML elements in a board */
     private wrapper: HTMLDivElement;
@@ -32,23 +30,39 @@ export class Board{
         noteElement.style.left = this.defaultNotePosition.x + "px";
         noteElement.style.top = this.defaultNotePosition.y + "px";
         
+        // TinyMCE editor configuration
         noteElement.querySelector(".note-content")!.addEventListener("mousedown", (e) => {
+            // tinymce will be initialised on this textarea element
             let textArea = document.createElement("textarea");
-            // textArea.style.display = "none";
             this.wrapper.appendChild(textArea);
+
             tinymce.init({
-                selector: "textarea"
+                selector: "textarea",
+                width: "80vw",
+                height: "40vh",
+                min_height: 150
             }).then(() => {
+                // don't allow clicking outside the editor when it's open
+                this.wrapper.querySelectorAll("*:not(.tox, .tox *)").forEach(el => {
+                    let element = el as HTMLElement;
+                    element.style.pointerEvents = "none";
+                });
                 // Replace tinymce's bottom bar with a custom one
                 let tinymceBottomRightBar = document.querySelector(".tox-statusbar__branding") as HTMLSpanElement;
                 tinymceBottomRightBar.innerHTML = "";
                 tinymceBottomRightBar.appendChild(this.createCustomTinymceBar());
                 
+                // Function for closing the editor, used by both save and close buttons
                 let closeEditor = () => {
+                    this.wrapper.querySelectorAll("*:not(.tox, .tox *)").forEach(el => {
+                        let element = el as HTMLElement;
+                        element.style.pointerEvents = "all";
+                    });
                     tinymce.remove();
                     textArea.remove();
                 }
 
+                // Listeners for custom bar buttons
                 tinymceBottomRightBar.querySelector(".tinymce-button-exit")!.addEventListener("click", closeEditor);
                 tinymceBottomRightBar.querySelector(".tinymce-button-save")!.addEventListener("click", () => {
                     content = tinymce.activeEditor!.getContent();
@@ -90,6 +104,7 @@ export class Board{
         this.counterAll.innerText = this.allCount.toString();
         this.counterActive.innerText = this.activeCount.toString();
     }
+    /* Methods for generating html structures */
     private createNoteElement(id: number, title: string, content: string){
         // Create note HTML element structure
         let noteElement = document.createElement("div");
