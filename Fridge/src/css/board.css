@@ -79,6 +79,21 @@ body{
     overflow: scroll;
     resize: both;
 }
+.note-title{
+    font-weight: bold;
+    font-size: 1.5rem;
+    position: relative;
+    width: fit-content;
+}
+.note-title::after{
+    content: "";
+    display: inline-block;
+    position: absolute;
+    bottom: -6px; left: 0;
+    height: 2px;
+    width: 110%;
+    background-color: var(--color-6);
+}
 .note-close{
     position: absolute;
     right: 5px; 
@@ -112,12 +127,14 @@ body{
 .note-moving{
     background-color: var(--color-3);
 }
+/*The tinymce editor*/
 .tox{
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     resize: vertical;
 }
+/*Custom buttons for tinymce*/
 .tinymce-button-exit, .tinymce-button-save{
     display: inline-flex !important;
     justify-content: center !important;

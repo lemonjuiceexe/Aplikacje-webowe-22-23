@@ -39,7 +39,7 @@ export class Board{
             tinymce.init({
                 selector: "textarea",
                 width: "80vw",
-                height: "40vh",
+                height: "60vh",
                 min_height: 150
             }).then(() => {
                 // don't allow clicking outside the editor when it's open
@@ -77,7 +77,7 @@ export class Board{
         });
 
         this.wrapper.appendChild(noteElement);
-        
+
         // Logic
         const position = {...this.defaultNotePosition};
         const size = {...this.defaultNoteSize};
@@ -116,6 +116,7 @@ export class Board{
         noteElement.appendChild(dragzone);
         
         let noteTitleElement = document.createElement("h3");
+        noteTitleElement.classList.add("note-title");
         noteTitleElement.innerText = title;
         dragzone.appendChild(noteTitleElement);
         
@@ -126,7 +127,7 @@ export class Board{
         
         let noteContentElement = document.createElement("p");
         noteContentElement.classList.add("note-content");
-        noteContentElement.innerText = content;
+        noteContentElement.innerHTML = content;
         dragzone.appendChild(noteContentElement);
     
     
