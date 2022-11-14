@@ -29,6 +29,7 @@ export class Note{
     }
 
     private dragStart(e: MouseEvent){
+        this.noteElement.classList.add("note-moving");
         let previousDragX = e.clientX;
         let previousDragY = e.clientY;
 
@@ -50,7 +51,7 @@ export class Note{
         }
 
         const dragEnd = (e: MouseEvent) => {
-            console.log(this.position);
+            this.noteElement.classList.remove("note-moving");
             document.removeEventListener("mousemove", drag);
             document.removeEventListener("mouseup", dragEnd);
         }
