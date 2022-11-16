@@ -2,7 +2,7 @@ import { Board } from "./board";
 
 export class Note{
     public readonly board: Board;
-    public readonly id: number;
+    public readonly noteId: number;
     public title: string;
     public content: string = "";
     public position: {x: number, y: number};
@@ -16,7 +16,7 @@ export class Note{
         this.board = board;
         this.noteElement = noteElement;
         
-        this.id = id;
+        this.noteId = id;
         this.title = title;
         this.content = content;
         this.position = position;

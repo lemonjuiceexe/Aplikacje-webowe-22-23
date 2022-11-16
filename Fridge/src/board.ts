@@ -1,6 +1,7 @@
+import { IBoard, INote } from "./objectTemplates"; // Templates for how the data should look like
+import { Note } from "./note";
 import tinymce from "tinymce";
 import "./css/board.css";
-import { Note } from "./note";
 
 export class Board{
     /* References to HTML elements in a board */
@@ -9,6 +10,7 @@ export class Board{
     private counterActive: HTMLSpanElement;
 
     /* Readonly consts */
+    public readonly boardId: string; 
     private readonly defaultNotePosition: {x: number, y: number} = {x: 200, y: 200};
     private readonly defaultNoteSize: {width: number, height: number} = {width: 200, height: 200};
 
@@ -17,7 +19,8 @@ export class Board{
     private allCount: number = 0;
     private activeCount: number = 0;
 
-    constructor(wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement){
+    constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement){
+        this.boardId = boardId;
         this.wrapper = wrapper;
         this.counterAll = counterAll;
         this.counterActive = counterActive;
@@ -87,13 +90,36 @@ export class Board{
         this.updateCounters(Boolean(1));
     }
     public removeNote(note: Note){
-        this.notes = this.notes.filter(el => el.id != note.id);
+        this.notes = this.notes.filter(el => el.noteId != note.noteId);
         this.updateCounters(Boolean(0));
 
-        const noteToRemove = this.wrapper.querySelector("#note-" + note.id);
+        const noteToRemove = this.wrapper.querySelector("#note-" + note.noteId);
         if(noteToRemove) { this.wrapper.removeChild(noteToRemove); }
-        else { console.error("Note with id " + note.id + " not found"); return; }
+        else { console.error("Note with id " + note.noteId + " not found"); return; }
         console.log(this.notes);
+    }
+    /* Fetching */
+    public getBoardData(){
+        let data: IBoard = {
+            boardId: this.boardId,
+            defaultNotePosition: this.defaultNotePosition,
+            defaultNoteSize: this.defaultNoteSize,
+            // notes: this.notes,
+            notes: this.notes.map(note => {
+                return {
+                    noteId: note.noteId,
+                    title: note.title,
+                    content: note.content,
+                    position: note.position,
+                    size: note.size
+                }
+            })
+        }
+
+        return JSON.stringify(data);
+    }
+    public sendBoardData(){
+        fetch("")
     }
 
     /* Private methods */
