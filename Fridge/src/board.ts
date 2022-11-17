@@ -3,6 +3,8 @@ import { Note } from "./note";
 import tinymce from "tinymce";
 import "./css/board.css";
 
+//TODO: encodeURI for anything user can input
+
 export class Board{
     /* References to HTML elements in a board */
     private wrapper: HTMLDivElement;
