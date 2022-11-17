@@ -100,6 +100,10 @@ export class Board{
     }
     /* Fetching */
     public getBoardData(){
+
+        this.addNote("test", "test");
+        this.addNote("hehe", "<b>dzien dobry</b>")
+
         let data: IBoard = {
             boardId: this.boardId,
             defaultNotePosition: this.defaultNotePosition,
