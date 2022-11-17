@@ -100,6 +100,10 @@ export class Board{
     }
     /* Fetching */
     public getBoardData(){
+
+        this.addNote("test", "test");
+        this.addNote("hehe", "<b>dzien dobry</b>")
+
         let data: IBoard = {
             boardId: this.boardId,
             defaultNotePosition: this.defaultNotePosition,
@@ -119,7 +123,11 @@ export class Board{
         return JSON.stringify(data);
     }
     public sendBoardData(){
-        fetch("")
+        fetch("../fetch.php",
+        {
+            method: "POST",
+            body: this.getBoardData()
+        }).then(res => res.text()).then(res => console.log(res));
     }
 
     /* Private methods */
