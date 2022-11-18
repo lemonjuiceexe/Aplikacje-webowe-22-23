@@ -22,12 +22,21 @@
         die("Connection failed: " . $connection->connect_error);
     }
 
-    $query = "INSERT INTO ". $table. " (boardId, defaultNotePosition, defaultNoteSize, allCount, notes) VALUES("
+    $query = "INSERT IGNORE INTO ". $table. " (boardId, defaultNotePosition, defaultNoteSize, allCount, notes) VALUES("
     ."'". $result["boardId"]. "', "
     ."'". json_encode($result["defaultNotePosition"]). "', "
     ."'". json_encode($result["defaultNoteSize"]). "', "
     ."'". $result["allCount"]. "', "
-    ."'". json_encode($result["notes"]). "');";
+    ."'". json_encode($result["notes"]). "') "
+    ."ON DUPLICATE KEY UPDATE "
+    ."defaultNotePosition='"
+    . json_encode($result["defaultNotePosition"]). "', ".
+    "defaultNoteSize='"
+    . json_encode($result["defaultNoteSize"]). "', ".
+    "allCount='"
+    . $result["allCount"]. "', ".
+    "notes='"
+    . json_encode($result["notes"]). "'";
 
 	print($query);
 
