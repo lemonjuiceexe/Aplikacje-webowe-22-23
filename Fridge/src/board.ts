@@ -104,7 +104,7 @@ export class Board{
     public getBoardData(){
 
         this.addNote("test", "test");
-        this.addNote("hehe", "<b>dzien dobry</b>")
+        this.addNote("hehe", "<b>dzien dobry</b>");
 
         let data: IBoard = {
             boardId: this.boardId,
