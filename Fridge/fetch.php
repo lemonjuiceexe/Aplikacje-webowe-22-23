@@ -12,11 +12,11 @@
     
     // now data is accessible like that: $result["notes"] is a dictionary of notes
 
-    include '~/Fridge/auth.php'; // contains $username and $password for the database
+    include 'auth.php'; // contains $username and $password for the database
     $server = '127.0.0.1';
     $database = 'fridge';
     $table = 'fridge';
-    $connection = new mysqli($server, $username, $password, $database);
+    $connection = new mysqli($server, $user, $password, $database);
     if ($connection->connect_error) {
         die("Connection failed: " . $connection->connect_error);
     }

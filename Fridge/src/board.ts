@@ -125,7 +125,7 @@ export class Board{
         return JSON.stringify(data);
     }
     public sendBoardData(){
-        fetch("../fetch.php",
+        fetch("./fetch.php",
         {
             method: "POST",
             body: this.getBoardData()
