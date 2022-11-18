@@ -3,6 +3,8 @@ import { Note } from "./note";
 import tinymce from "tinymce";
 import "./css/board.css";
 
+//TODO: encodeURI for anything user can input
+
 export class Board{
     /* References to HTML elements in a board */
     private wrapper: HTMLDivElement;
@@ -117,17 +119,44 @@ export class Board{
                     position: note.position,
                     size: note.size
                 }
-            })
+            }),
+            allCount: this.allCount
         }
 
         return JSON.stringify(data);
     }
     public sendBoardData(){
-        fetch("../fetch.php",
+        fetch("./send.php",
         {
             method: "POST",
             body: this.getBoardData()
-        }).then(res => res.text()).then(res => console.log(res));
+        }).then(res => res.text()).then(res => 
+            console.log(res)
+        );
+    }
+    public importBoardData(){
+        fetch("./get.php", 
+        {
+            method: "GET"
+        }).then(res => res.text()).then(res => {
+            let data: IBoard = JSON.parse(res);
+            this.defaultNotePosition.x = data.defaultNotePosition.x;
+            this.defaultNotePosition.y = data.defaultNotePosition.y;
+            this.defaultNoteSize.width = data.defaultNoteSize.width;
+            this.defaultNoteSize.height = data.defaultNoteSize.height;
+            if(data.notes){
+                data.notes.forEach((note: INote) => {
+                    this.addNote(note.title ? note.title : "no title found",
+                                 note.content ? note.content : "no content found");
+                });
+            }
+            if(data.allCount){
+                this.allCount = data.allCount;
+            }
+            else{
+                this.allCount = this.notes.length;
+            }
+        });
     }
 
     /* Private methods */
