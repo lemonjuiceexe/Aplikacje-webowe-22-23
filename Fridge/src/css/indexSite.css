@@ -1,0 +1,59 @@
+@import url("root.css");
+
+.wrapper{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 2.3rem;
+}
+.wrapper > *{
+    margin: 1em;
+}
+.wrapper > input,
+.wrapper > button{
+    all: unset;
+    position: relative;
+    min-width: fit-content;
+    margin: 1em;
+    padding: 0.5em 1.4em;
+    border: 3px solid #fff;
+    text-align: center;
+
+    transition: all 300ms ease-in-out;
+}
+.wrapper > input{
+    border-radius: 15px;
+    letter-spacing: 2px;
+}
+.wrapper > button{
+    border-width: 1px;
+    border-radius: 25px;
+}
+.wrapper > button::after{
+    content: "";
+    position: absolute;
+    top: calc(100% - 0.5em);
+    left: calc(1em + 10px);
+    width: 0;
+    height: 1px;
+    background-color: #fff;
+
+    transition: all 300ms ease-in-out;
+}
+
+.wrapper > input:hover,
+.wrapper > input:focus,
+.wrapper > button:hover,
+.wrapper > button:focus{
+    background-color: var(--color-2);
+    border-color: var(--color-2);
+    color: #363636;
+    cursor: pointer;
+}
+.wrapper > button:hover::after,
+.wrapper > button:focus::after{
+    width: 75%;
+    background-color: #363636;
+}

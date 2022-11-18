@@ -1,0 +1,31 @@
+@import url("reset.css");
+
+:root{
+    /* Generate variables from https://colorhunt.co/palette/def5e5bcead59ed5c58ec3b0*/
+    --color-1: #def5e5;
+    --color-2: #bcead5;
+    --color-3: #9ed5c5;
+    --bg: #8ec3b0;
+    --color-5: #7eb39b;
+    --color-6: #6da286;
+    --color-7: #5c9061;
+    --color-8: #4b7e3c;
+    --color-9: #3a6c17;
+    --color-10: #295a02;
+}
+
+::selection {
+    color: var(--color-1);
+    background-color: var(--color-6);
+}
+
+body{
+    max-height: 100vh;
+}
+.wrapper{
+    width: 100vw;
+    height: 100vh;
+    overflow: none;
+    background-color: var(--bg);
+    color: var(--color-1);
+}
