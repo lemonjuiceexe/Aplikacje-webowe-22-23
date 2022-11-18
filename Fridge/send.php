@@ -1,4 +1,4 @@
-<?php 
+<?php
     //TODO: use bind_param for security
 
     // get the data sent by the client
@@ -11,7 +11,8 @@
     $result = json_decode($result, true);
     
     // now data is accessible like that: $result["notes"] is a dictionary of notes
-
+	//print_r($result);
+	
     include 'auth.php'; // contains $username and $password for the database
     $server = '127.0.0.1';
     $database = 'fridge';
@@ -21,12 +22,14 @@
         die("Connection failed: " . $connection->connect_error);
     }
 
-    $query = "INSERT INTO". $table. " (boardId, defaultNotePosition, defaultNoteSize, allCount, notes) VALUES( "
-    . $result["boardId"]. ", "
-    . $result["defaultNotePosition"]. ", "
-    . $result["defaultNoteSize"]. ", "
-    . $result["allCount"]. ", "
-    . $result["notes"]. ");";
+    $query = "INSERT INTO ". $table. " (boardId, defaultNotePosition, defaultNoteSize, allCount, notes) VALUES("
+    ."'". $result["boardId"]. "', "
+    ."'". json_encode($result["defaultNotePosition"]). "', "
+    ."'". json_encode($result["defaultNoteSize"]). "', "
+    ."'". $result["allCount"]. "', "
+    ."'". json_encode($result["notes"]). "');";
+
+	print($query);
 
     $answer = $connection->query($query);
     if(str_starts_with($answer, 'ERROR')){

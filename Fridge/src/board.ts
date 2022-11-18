@@ -119,7 +119,8 @@ export class Board{
                     position: note.position,
                     size: note.size
                 }
-            })
+            }),
+            allCount: this.allCount
         }
 
         return JSON.stringify(data);
