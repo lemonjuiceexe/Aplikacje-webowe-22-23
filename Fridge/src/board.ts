@@ -125,11 +125,37 @@ export class Board{
         return JSON.stringify(data);
     }
     public sendBoardData(){
-        fetch("./fetch.php",
+        fetch("./send.php",
         {
             method: "POST",
             body: this.getBoardData()
-        }).then(res => res.text()).then(res => console.log(res));
+        }).then(res => res.text()).then(res => 
+            console.log(res)
+        );
+    }
+    public importBoardData(){
+        fetch("./get.php", 
+        {
+            method: "GET"
+        }).then(res => res.text()).then(res => {
+            let data: IBoard = JSON.parse(res);
+            this.defaultNotePosition.x = data.defaultNotePosition.x;
+            this.defaultNotePosition.y = data.defaultNotePosition.y;
+            this.defaultNoteSize.width = data.defaultNoteSize.width;
+            this.defaultNoteSize.height = data.defaultNoteSize.height;
+            if(data.notes){
+                data.notes.forEach((note: INote) => {
+                    this.addNote(note.title ? note.title : "no title found",
+                                 note.content ? note.content : "no content found");
+                });
+            }
+            if(data.allCount){
+                this.allCount = data.allCount;
+            }
+            else{
+                this.allCount = this.notes.length;
+            }
+        });
     }
 
     /* Private methods */
