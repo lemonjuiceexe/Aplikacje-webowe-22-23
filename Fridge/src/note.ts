@@ -14,7 +14,7 @@ export class Note{
     private dragzone: HTMLElement;
     private closeButton: HTMLElement;
 
-    constructor(board: Board, noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, content: string = ""){
+    constructor(board: Board, noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, zindex = -1, content: string = ""){
         this.board = board;
         this.noteElement = noteElement;
         
@@ -23,8 +23,13 @@ export class Note{
         this.content = content;
         this.position = position;
         this.size = size;
-        this.zindex = 0; // initialised so compiler knows it's initialised in constructor, actually set the line below
-        this.setZIndex(this.board.maxZIndex + 1);
+        this.zindex = zindex;
+        if(zindex == -1){
+            this.setZIndex(this.board.maxZIndex + 1);
+        }
+        else{
+            this.setZIndex(zindex);
+        }
 
         this.dragzone = noteElement.querySelector(".note-drag-zone") as HTMLElement;
         this.closeButton = noteElement.querySelector(".note-close") as HTMLElement;
@@ -82,12 +87,17 @@ export class Note{
         });
     }
 
-    public setZIndex(value: number){
-        this.zindex = value;
-        this.noteElement.style.zIndex = this.zindex.toString();
+    public setZIndex(zindex: number){
+        this.zindex = zindex;
+        this.noteElement.style.zIndex = zindex.toString();
+        if(zindex > this.board.maxZIndex){
+            this.board.maxZIndex = zindex;
+        }
     }
 
     private dragStart(e: MouseEvent){
+        e.preventDefault();
+        this.setZIndex(this.board.maxZIndex + 1);
         this.noteElement.classList.add("note-moving");
         this.board.maxZIndex++;
         this.noteElement.style.zIndex = this.board.maxZIndex.toString();

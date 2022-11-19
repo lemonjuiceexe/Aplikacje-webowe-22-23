@@ -29,22 +29,36 @@ export class Board{
     }
     
     /*Public methods */
-    public addNote(title: string, content: string){
+    public addNote(
+                    title: string, content: string, 
+                    // optional arguments
+                    id: number = this.allCount, 
+                    position: {x: number, y: number} = {...this.defaultNotePosition},
+                    size: {width: number, height: number} = {...this.defaultNoteSize},
+                    zindex: number = this.maxZIndex + 1){
+        
         /* Setup the note HTML element */
         const noteElement = this.createNoteElement(this.allCount, title, content);
         noteElement.style.left = this.defaultNotePosition.x + "px";
         noteElement.style.top = this.defaultNotePosition.y + "px";
+<<<<<<< HEAD
         
         // noteElement.style.zIndex = this.maxZIndex.toString();
+=======
+>>>>>>> 986b8eff027bbe79bf49883e9f8b03f8a5541ff3
 
         this.wrapper.appendChild(noteElement);
 
         // Logic
+<<<<<<< HEAD
         const position = {...this.defaultNotePosition};
         const size = {...this.defaultNoteSize};
 
         let note = new Note(this, noteElement, this.allCount, title, position, size, content);
         // this.maxZIndex++;
+=======
+        let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content);
+>>>>>>> 986b8eff027bbe79bf49883e9f8b03f8a5541ff3
         note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
@@ -58,6 +72,7 @@ export class Board{
         else { console.error("Note with id " + note.noteId + " not found"); return; }
         console.log(this.notes);
     }
+
     /* Fetching */
     public getBoardData(){
 
@@ -75,7 +90,8 @@ export class Board{
                     title: note.title,
                     content: note.content,
                     position: note.position,
-                    size: note.size
+                    size: note.size,
+                    zindex: note.zindex
                 }
             }),
             allCount: this.allCount
@@ -102,10 +118,19 @@ export class Board{
             this.defaultNotePosition.y = data.defaultNotePosition.y;
             this.defaultNoteSize.width = data.defaultNoteSize.width;
             this.defaultNoteSize.height = data.defaultNoteSize.height;
+
+            this.maxZIndex = data.notes ? data.notes.length : 0;
+
             if(data.notes){
                 data.notes.forEach((note: INote) => {
+                    if(note.zindex && note.zindex > this.maxZIndex){ this.maxZIndex = note.zindex };
+
                     this.addNote(note.title ? note.title : "no title found",
-                                 note.content ? note.content : "no content found");
+                                 note.content ? note.content : "no content found"),
+                                 note.noteId,
+                                 note.position ? note.position : this.defaultNotePosition,
+                                 note.size ? note.size : this.defaultNoteSize,
+                                 note.zindex ? note.zindex : 0;
                 });
             }
             if(data.allCount){
