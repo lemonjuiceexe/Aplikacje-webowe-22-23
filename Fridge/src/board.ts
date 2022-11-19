@@ -33,8 +33,8 @@ export class Board{
                     title: string, content: string, 
                     // optional arguments
                     id: number = this.allCount, 
-                    position: {x: number, y: number} = {...this.defaultNotePosition},
-                    size: {width: number, height: number} = {...this.defaultNoteSize},
+                    position: {x: number, y: number},
+                    size: {width: number, height: number},
                     zindex: number = this.maxZIndex + 1){
         
         /* Setup the note HTML element */
@@ -49,6 +49,31 @@ export class Board{
         note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
+
+        this.sendBoardData();
+    }
+    public addDefaultNote(){
+        let id = this.allCount;
+        let title = "Note " + id;
+        let content = encodeURIComponent("Content " + id);
+        let position = {...this.defaultNotePosition};
+        let size = {...this.defaultNoteSize};
+        let zindex = this.maxZIndex + 1;
+
+        /* Setup the note HTML element */
+        const noteElement = this.createNoteElement(this.allCount, title, content);
+        noteElement.style.left = this.defaultNotePosition.x + "px";
+        noteElement.style.top = this.defaultNotePosition.y + "px";
+ 
+        this.wrapper.appendChild(noteElement);
+ 
+        // Logic
+        let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content);
+        note.setZIndex(this.maxZIndex++);
+        this.notes.push(note);
+        this.updateCounters(Boolean(1));
+ 
+        this.sendBoardData();
     }
     public removeNote(note: Note){
         this.notes = this.notes.filter(el => el.noteId != note.noteId);
@@ -62,10 +87,6 @@ export class Board{
 
     /* Fetching */
     public getBoardData(){
-
-        this.addNote("test", "test");
-        this.addNote("hehe", "<b>dzien dobry</b>");
-
         let data: IBoard = {
             boardId: this.boardId,
             defaultNotePosition: this.defaultNotePosition,
@@ -78,12 +99,12 @@ export class Board{
                     content: note.content,
                     position: note.position,
                     size: note.size,
-                    zindex: note.zindex
+                    zindex: note.zindex + 1
                 }
             }),
             allCount: this.allCount
         }
-
+        console.log(data);
         return JSON.stringify(data);
     }
     public sendBoardData(){
@@ -113,11 +134,11 @@ export class Board{
                     if(note.zindex && note.zindex > this.maxZIndex){ this.maxZIndex = note.zindex };
 
                     this.addNote(note.title ? note.title : "no title found",
-                                 note.content ? note.content : "no content found"),
+                                 note.content ? note.content : "no content found",
                                  note.noteId,
                                  note.position ? note.position : this.defaultNotePosition,
                                  note.size ? note.size : this.defaultNoteSize,
-                                 note.zindex ? note.zindex : 0;
+                                 note.zindex ? note.zindex : 0);
                 });
             }
             if(data.allCount){
@@ -149,7 +170,8 @@ export class Board{
         noteElement.appendChild(noteInnerWrapper);
         
         let noteTitleElement = document.createElement("h3");
-        noteTitleElement.classList.add("note-title"); noteTitleElement.classList.add("note-drag-zone");
+        noteTitleElement.classList.add("note-title"); 
+        noteTitleElement.classList.add("note-drag-zone");
         noteTitleElement.innerText = title;
         noteInnerWrapper.appendChild(noteTitleElement);
         
@@ -160,7 +182,7 @@ export class Board{
         
         let noteContentElement = document.createElement("p");
         noteContentElement.classList.add("note-content");
-        noteContentElement.innerHTML = content;
+        noteContentElement.innerHTML = decodeURIComponent(content);
         noteInnerWrapper.appendChild(noteContentElement);
     
     

@@ -1,6 +1,8 @@
 import { Board } from "./board";
 import tinymce from "tinymce";
 
+//TODO: Sync the board on note resize
+
 export class Note{
     public readonly board: Board;
     public readonly noteId: number;
@@ -34,7 +36,7 @@ export class Note{
         this.dragzone = noteElement.querySelector(".note-drag-zone") as HTMLElement;
         this.closeButton = noteElement.querySelector(".note-close") as HTMLElement;
         this.dragzone.addEventListener("mousedown", this.dragStart.bind(this));
-        this.closeButton.addEventListener("mousedown", () => board.removeNote(this));
+        this.closeButton.addEventListener("mousedown", () => {board.removeNote(this); board.sendBoardData();});
 
         // TinyMCE editor configuration
         this.noteElement.querySelector(".note-content")!.addEventListener("mousedown", (e) => {
@@ -77,6 +79,10 @@ export class Note{
                 tinymceBottomRightBar.querySelector(".tinymce-button-save")!.addEventListener("click", () => {
                     content = tinymce.activeEditor!.getContent();
                     noteElement.querySelector(".note-content")!.innerHTML = content;
+                    this.content = encodeURIComponent(content);
+
+                    this.board.sendBoardData();
+
                     closeEditor();
                 });
 
@@ -125,6 +131,8 @@ export class Note{
             this.noteElement.classList.remove("note-moving");
             document.removeEventListener("mousemove", drag);
             document.removeEventListener("mouseup", dragEnd);
+
+            this.board.sendBoardData();
         }
 
         document.addEventListener("mousemove", drag);
