@@ -7,12 +7,13 @@ export class Note{
     public content: string = "";
     public position: {x: number, y: number};
     public size: {width: number, height: number};
+    public zindex: number;
 
     public noteElement: HTMLDivElement;
     private dragzone: HTMLElement;
     private closeButton: HTMLElement;
 
-    constructor(board: Board, noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, content: string = ""){
+    constructor(board: Board, noteElement: HTMLDivElement, id: number, title: string, position: {x: number, y: number}, size: {width: number, height:number}, zindex = -1, content: string = ""){
         this.board = board;
         this.noteElement = noteElement;
         
@@ -21,11 +22,23 @@ export class Note{
         this.content = content;
         this.position = position;
         this.size = size;
+        this.zindex = zindex;
+        if(zindex == -1){
+            this.setZIndex(this.board.maxZIndex + 1);
+        }
+        else{
+            this.setZIndex(zindex);
+        }
 
         this.dragzone = noteElement.querySelector(".note-drag-zone") as HTMLElement;
         this.closeButton = noteElement.querySelector(".note-close") as HTMLElement;
         this.dragzone.addEventListener("mousedown", this.dragStart.bind(this));
         this.closeButton.addEventListener("mousedown", () => board.removeNote(this));
+    }
+
+    public setZIndex(zindex: number){
+        this.zindex = zindex;
+        this.noteElement.style.zIndex = zindex.toString();
     }
 
     private dragStart(e: MouseEvent){
