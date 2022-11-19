@@ -41,24 +41,11 @@ export class Board{
         const noteElement = this.createNoteElement(this.allCount, title, content);
         noteElement.style.left = this.defaultNotePosition.x + "px";
         noteElement.style.top = this.defaultNotePosition.y + "px";
-<<<<<<< HEAD
-        
-        // noteElement.style.zIndex = this.maxZIndex.toString();
-=======
->>>>>>> 986b8eff027bbe79bf49883e9f8b03f8a5541ff3
 
         this.wrapper.appendChild(noteElement);
 
         // Logic
-<<<<<<< HEAD
-        const position = {...this.defaultNotePosition};
-        const size = {...this.defaultNoteSize};
-
-        let note = new Note(this, noteElement, this.allCount, title, position, size, content);
-        // this.maxZIndex++;
-=======
         let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content);
->>>>>>> 986b8eff027bbe79bf49883e9f8b03f8a5541ff3
         note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));

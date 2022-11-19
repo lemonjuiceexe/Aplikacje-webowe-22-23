@@ -8,7 +8,7 @@ export class Note{
     public content: string = "";
     public position: {x: number, y: number};
     public size: {width: number, height: number};
-    private zindex: number;
+    public zindex: number;
 
     public noteElement: HTMLDivElement;
     private dragzone: HTMLElement;
