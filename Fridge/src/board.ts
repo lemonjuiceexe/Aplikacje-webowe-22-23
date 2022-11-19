@@ -20,6 +20,7 @@ export class Board{
     private notes: Note[] = [];
     private allCount: number = 0;
     private activeCount: number = 0;
+    public maxZIndex: number = 0;
 
     constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement){
         this.boardId = boardId;
@@ -29,65 +30,24 @@ export class Board{
     }
     
     /*Public methods */
-    public addNote(title: string, content: string){
+    public addNote(
+                    title: string, content: string, 
+                    // optional arguments
+                    id: number = this.allCount, 
+                    position: {x: number, y: number} = {...this.defaultNotePosition},
+                    size: {width: number, height: number} = {...this.defaultNoteSize},
+                    zindex: number = this.maxZIndex + 1){
+        
         /* Setup the note HTML element */
         const noteElement = this.createNoteElement(this.allCount, title, content);
         noteElement.style.left = this.defaultNotePosition.x + "px";
         noteElement.style.top = this.defaultNotePosition.y + "px";
-        
-        // TinyMCE editor configuration
-        noteElement.querySelector(".note-content")!.addEventListener("mousedown", (e) => {
-            // tinymce will be initialised on this textarea element
-            let textArea = document.createElement("textarea");
-            this.wrapper.appendChild(textArea);
-
-            tinymce.init({
-                selector: "textarea",
-                width: "80vw",
-                height: "60vh",
-                min_height: 150
-            }).then(() => {
-                // don't allow clicking outside the editor when it's open
-                this.wrapper.querySelectorAll("*:not(.tox, .tox *)").forEach(el => {
-                    let element = el as HTMLElement;
-                    element.style.pointerEvents = "none";
-                });
-                // Replace tinymce's bottom bar with a custom one
-                let tinymceBottomRightBar = document.querySelector(".tox-statusbar__branding") as HTMLSpanElement;
-                tinymceBottomRightBar.innerHTML = "";
-                tinymceBottomRightBar.appendChild(this.createCustomTinymceBar());
-                
-                // Function for closing the editor, used by both save and close buttons
-                let closeEditor = () => {
-                    this.wrapper.querySelectorAll("*:not(.tox, .tox *)").forEach(el => {
-                        let element = el as HTMLElement;
-                        element.style.pointerEvents = "all";
-                    });
-                    tinymce.remove();
-                    textArea.remove();
-                }
-
-                // Listeners for custom bar buttons
-                tinymceBottomRightBar.querySelector(".tinymce-button-exit")!.addEventListener("click", closeEditor);
-                tinymceBottomRightBar.querySelector(".tinymce-button-save")!.addEventListener("click", () => {
-                    content = tinymce.activeEditor!.getContent();
-                    noteElement.querySelector(".note-content")!.innerHTML = content;
-                    closeEditor();
-                });
-
-                tinymce.activeEditor!.setContent(content);
-                tinymce.activeEditor!.focus();
-            });
-            
-        });
 
         this.wrapper.appendChild(noteElement);
 
         // Logic
-        const position = {...this.defaultNotePosition};
-        const size = {...this.defaultNoteSize};
-
-        let note = new Note(this, noteElement, this.allCount, title, position, size, content);
+        let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content);
+        note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
     }
@@ -100,6 +60,7 @@ export class Board{
         else { console.error("Note with id " + note.noteId + " not found"); return; }
         console.log(this.notes);
     }
+
     /* Fetching */
     public getBoardData(){
 
@@ -117,7 +78,8 @@ export class Board{
                     title: note.title,
                     content: note.content,
                     position: note.position,
-                    size: note.size
+                    size: note.size,
+                    zindex: note.zindex
                 }
             }),
             allCount: this.allCount
@@ -144,10 +106,19 @@ export class Board{
             this.defaultNotePosition.y = data.defaultNotePosition.y;
             this.defaultNoteSize.width = data.defaultNoteSize.width;
             this.defaultNoteSize.height = data.defaultNoteSize.height;
+
+            this.maxZIndex = data.notes ? data.notes.length : 0;
+
             if(data.notes){
                 data.notes.forEach((note: INote) => {
+                    if(note.zindex && note.zindex > this.maxZIndex){ this.maxZIndex = note.zindex };
+
                     this.addNote(note.title ? note.title : "no title found",
-                                 note.content ? note.content : "no content found");
+                                 note.content ? note.content : "no content found"),
+                                 note.noteId,
+                                 note.position ? note.position : this.defaultNotePosition,
+                                 note.size ? note.size : this.defaultNoteSize,
+                                 note.zindex ? note.zindex : 0;
                 });
             }
             if(data.allCount){
