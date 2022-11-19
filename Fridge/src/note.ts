@@ -39,9 +39,14 @@ export class Note{
     public setZIndex(zindex: number){
         this.zindex = zindex;
         this.noteElement.style.zIndex = zindex.toString();
+        if(zindex > this.board.maxZIndex){
+            this.board.maxZIndex = zindex;
+        }
     }
 
     private dragStart(e: MouseEvent){
+        e.preventDefault();
+        this.setZIndex(this.board.maxZIndex + 1);
         this.noteElement.classList.add("note-moving");
         let previousDragX = e.clientX;
         let previousDragY = e.clientY;
