@@ -24,10 +24,11 @@
     $query = "SELECT * FROM ". $table. ";";
     $answer = $connection->query($query);
     if($answer->num_rows > 0){
+        echo $answer;
         // output data of each row
-        while($row = $answer->fetch_assoc()){
-            echo "id: " . $row["id"]. " - defPos: " . $row["defaultNotePosition"]. " - defSize: " . $row["defaultNoteSize"]. " - count: ". $row["allCount"]. " - notes: " . $row["notes"]. "<br>";
-        }
+        // while($row = $answer->fetch_assoc()){
+        //     echo "id: " . $row["id"]. " - defPos: " . $row["defaultNotePosition"]. " - defSize: " . $row["defaultNoteSize"]. " - count: ". $row["allCount"]. " - notes: " . $row["notes"]. "<br>";
+        // }
     }
     else{
         echo "0 results";

@@ -19,13 +19,15 @@
     background-color: var(--color-6);
 }
 
+html, body, .wrapper{
+    overflow: hidden;
+}
 body{
     max-height: 100vh;
 }
 .wrapper{
     width: 100vw;
     height: 100vh;
-    overflow: none;
     background-color: var(--bg);
     color: var(--color-1);
 }
