@@ -39,8 +39,8 @@ export class Board{
         
         /* Setup the note HTML element */
         const noteElement = this.createNoteElement(this.allCount, title, content);
-        noteElement.style.left = this.defaultNotePosition.x + "px";
-        noteElement.style.top = this.defaultNotePosition.y + "px";
+        noteElement.style.left = position.x + "px";
+        noteElement.style.top = position.y + "px";
 
         this.wrapper.appendChild(noteElement);
 
@@ -49,6 +49,15 @@ export class Board{
         note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                note.size.height = Math.round(entry.contentRect.height);
+                note.size.width = Math.round(entry.contentRect.width); 
+            }
+            this.sendBoardData();
+        });
+        resizeObserver.observe(noteElement);
 
         this.sendBoardData();
     }
@@ -62,6 +71,7 @@ export class Board{
 
         /* Setup the note HTML element */
         const noteElement = this.createNoteElement(this.allCount, title, content);
+
         noteElement.style.left = this.defaultNotePosition.x + "px";
         noteElement.style.top = this.defaultNotePosition.y + "px";
  
@@ -72,6 +82,15 @@ export class Board{
         note.setZIndex(this.maxZIndex++);
         this.notes.push(note);
         this.updateCounters(Boolean(1));
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (const entry of entries) {
+                note.size.height = Math.round(entry.contentRect.height);
+                note.size.width = Math.round(entry.contentRect.width); 
+            }
+            this.sendBoardData();
+        });
+        resizeObserver.observe(noteElement);
  
         this.sendBoardData();
     }
@@ -91,7 +110,6 @@ export class Board{
             boardId: this.boardId,
             defaultNotePosition: this.defaultNotePosition,
             defaultNoteSize: this.defaultNoteSize,
-            // notes: this.notes,
             notes: this.notes.map(note => {
                 return {
                     noteId: note.noteId,
