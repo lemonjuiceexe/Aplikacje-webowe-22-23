@@ -86,7 +86,7 @@ export class Note{
                     closeEditor();
                 });
 
-                tinymce.activeEditor!.setContent(content);
+                tinymce.activeEditor!.setContent(decodeURIComponent(content));
                 tinymce.activeEditor!.focus();
             });
             
