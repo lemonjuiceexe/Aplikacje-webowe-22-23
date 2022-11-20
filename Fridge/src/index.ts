@@ -6,7 +6,11 @@ boardNameInput.setAttribute("size", boardNameInput.getAttribute("placeholder")!.
 
 // sessionStorage.setItem("boardName", boardNameInput.value);
 
-const boardEnter = () => {
+document.querySelector("#enterButton")!.addEventListener("click", () => {
+    if(boardNameInput.value.length == 0){
+        alert("Please enter a board name!");
+        return;
+    }
     sessionStorage.setItem("boardName", boardNameInput.value);
     window.location.href='boardIndex.html';
-};
+});
