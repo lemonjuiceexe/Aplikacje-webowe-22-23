@@ -29,7 +29,7 @@ export class Board { /* References to HTML elements in a board */
      
     /*Public methods */ 
     public addNote(title: string, content: string,
-        id: number = this.allCount, 
+        id: number, 
         position: {x: number, y: number}, 
         size: {width: number, height: number}, 
         zindex: number){ 
