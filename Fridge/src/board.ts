@@ -143,10 +143,10 @@ export class Board { /* References to HTML elements in a board */
             let data: IBoard = JSON.parse(res); 
             console.log(data); 
 
-            this.defaultNotePosition.x = data.defaultNotePosition.x; 
-            this.defaultNotePosition.y = data.defaultNotePosition.y; 
-            this.defaultNoteSize.width = data.defaultNoteSize.width; 
-            this.defaultNoteSize.height = data.defaultNoteSize.height; 
+            this.defaultNotePosition.x = data.defaultNotePosition.x ? data.defaultNotePosition.x : 200; 
+            this.defaultNotePosition.y = data.defaultNotePosition.y ? data.defaultNotePosition.y : 200; 
+            this.defaultNoteSize.width = data.defaultNoteSize.width ? data.defaultNoteSize.width : 200; 
+            this.defaultNoteSize.height = data.defaultNoteSize.height ? data.defaultNoteSize.height : 200; 
             this.maxZIndex = data.notes ? data.notes.length : 0; 
 			this.allCount = data.allCount!;
             if(data.notes){ 
@@ -163,6 +163,9 @@ export class Board { /* References to HTML elements in a board */
                                  note.size ? note.size : this.defaultNoteSize, 
                                  note.zindex ? note.zindex : 0); 
                 }); 
+            }
+            else{
+				this.notes = [];
             }
             this.updateCounters(2); 
         }); 
