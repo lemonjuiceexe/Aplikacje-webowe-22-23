@@ -1,4 +1,7 @@
-import { Board } from "./board.js";
+import { Board } from "./board";
+
+alert("HASDOASD");
+console.log("HASHD");
 
 const wrapper = document.querySelector(".wrapper") as HTMLDivElement;
 const addNoteButton = wrapper.querySelector(".spawn-button") as HTMLDivElement;
