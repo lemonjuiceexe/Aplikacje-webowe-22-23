@@ -32,9 +32,10 @@ export class Board { /* References to HTML elements in a board */
         id: number, 
         position: {x: number, y: number}, 
         size: {width: number, height: number}, 
-        zindex: number){ 
+        zindex: number){
+        	console.log("Restoring #" + id); 
             /* Setup the note HTML element */ 
-            const noteElement = this.createNoteElement(this.allCount, title, content); 
+            const noteElement = this.createNoteElement(id, title, content); 
             noteElement.style.left = position.x + "px"; 
             noteElement.style.top = position.y + "px";
             noteElement.style.width = size.width + "px";
@@ -43,7 +44,7 @@ export class Board { /* References to HTML elements in a board */
             this.wrapper.appendChild(noteElement); 
             
             // Logic 
-            let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content); 
+            let note = new Note(this, noteElement, id, title, position, size, zindex, content); 
             note.setZIndex(zindex); 
             this.notes.push(note); 
             this.updateCounters(0); 
@@ -60,7 +61,8 @@ export class Board { /* References to HTML elements in a board */
             this.sendBoardData();  
     } 
     public addDefaultNote(){ 
-        let id = this.allCount; 
+        let id = this.allCount;
+        console.log("Adding #" + id); 
         let title = "Note " + id; 
         let content = encodeURIComponent("Content " + id); 
         let position = {...this.defaultNotePosition}; 
@@ -68,7 +70,7 @@ export class Board { /* References to HTML elements in a board */
         let zindex = this.maxZIndex + 1; 
         
         /* Setup the note HTML element */ 
-        const noteElement = this.createNoteElement(this.allCount, title, content); 
+        const noteElement = this.createNoteElement(id, title, content); 
         noteElement.style.left = this.defaultNotePosition.x + "px"; 
         noteElement.style.top = this.defaultNotePosition.y + "px"; 
         this.wrapper.appendChild(noteElement); 
@@ -91,6 +93,7 @@ export class Board { /* References to HTML elements in a board */
         this.sendBoardData(); 
     } 
     public removeNote(note: Note){ 
+		console.log("Removing #" + note.noteId);
         this.notes = this.notes.filter(el => el.noteId != note.noteId); 
         this.updateCounters(-1); 
         const noteToRemove = this.wrapper.querySelector("#note-" + note.noteId); 
@@ -122,7 +125,7 @@ export class Board { /* References to HTML elements in a board */
             }), 
             allCount: this.allCount 
         } 
-        console.log(data); 
+        //console.log(data); 
         return JSON.stringify(data); 
     } 
     public sendBoardData(){ 
@@ -131,7 +134,7 @@ export class Board { /* References to HTML elements in a board */
             method: "POST", 
             body: this.getBoardData() 
         }).then(res => res.text()).then(res => 
-            console.log(res) 
+            {}//console.log(res) 
         ); 
     } 
     public importBoardData(){ 
@@ -141,7 +144,7 @@ export class Board { /* References to HTML elements in a board */
         }).then(res => res.text()).then(res => { 
             if(res == "404") { console.log("No board data found. Creating a new board."); return; } 
             let data: IBoard = JSON.parse(res); 
-            console.log(data); 
+            //console.log(data); 
 
             this.defaultNotePosition.x = data.defaultNotePosition.x ? data.defaultNotePosition.x : 200; 
             this.defaultNotePosition.y = data.defaultNotePosition.y ? data.defaultNotePosition.y : 200; 
@@ -167,6 +170,7 @@ export class Board { /* References to HTML elements in a board */
             else{
 				this.notes = [];
             }
+            console.table(this.notes);
             this.updateCounters(2); 
         }); 
     } 
