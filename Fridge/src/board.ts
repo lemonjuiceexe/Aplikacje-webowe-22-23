@@ -25,15 +25,17 @@ export class Board { /* References to HTML elements in a board */
         this.counterActive = counterActive; 
         
         this.importBoardData(); 
-    } 
+    }
+     
     /*Public methods */ 
     public addNote(title: string, content: string,
-        id: number = this.allCount, 
+        id: number, 
         position: {x: number, y: number}, 
         size: {width: number, height: number}, 
-        zindex: number){ 
+        zindex: number){
+        	console.log("Restoring #" + id); 
             /* Setup the note HTML element */ 
-            const noteElement = this.createNoteElement(this.allCount, title, content); 
+            const noteElement = this.createNoteElement(id, title, content); 
             noteElement.style.left = position.x + "px"; 
             noteElement.style.top = position.y + "px";
             noteElement.style.width = size.width + "px";
@@ -42,10 +44,10 @@ export class Board { /* References to HTML elements in a board */
             this.wrapper.appendChild(noteElement); 
             
             // Logic 
-            let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content); 
+            let note = new Note(this, noteElement, id, title, position, size, zindex, content); 
             note.setZIndex(zindex); 
             this.notes.push(note); 
-            this.updateCounters(Boolean(1)); 
+            this.updateCounters(0); 
 
             const resizeObserver = new ResizeObserver(entries => {
                 for (const entry of entries) {
@@ -59,7 +61,8 @@ export class Board { /* References to HTML elements in a board */
             this.sendBoardData();  
     } 
     public addDefaultNote(){ 
-        let id = this.allCount; 
+        let id = this.allCount;
+        console.log("Adding #" + id); 
         let title = "Note " + id; 
         let content = encodeURIComponent("Content " + id); 
         let position = {...this.defaultNotePosition}; 
@@ -67,7 +70,7 @@ export class Board { /* References to HTML elements in a board */
         let zindex = this.maxZIndex + 1; 
         
         /* Setup the note HTML element */ 
-        const noteElement = this.createNoteElement(this.allCount, title, content); 
+        const noteElement = this.createNoteElement(id, title, content); 
         noteElement.style.left = this.defaultNotePosition.x + "px"; 
         noteElement.style.top = this.defaultNotePosition.y + "px"; 
         this.wrapper.appendChild(noteElement); 
@@ -76,7 +79,7 @@ export class Board { /* References to HTML elements in a board */
         let note = new Note(this, noteElement, this.allCount, title, position, size, zindex, content); 
         note.setZIndex(this.maxZIndex++); 
         this.notes.push(note); 
-        this.updateCounters(Boolean(1)); 
+        this.updateCounters(1); 
 
         const resizeObserver = new ResizeObserver(entries => {
             for (const entry of entries) {
@@ -90,8 +93,9 @@ export class Board { /* References to HTML elements in a board */
         this.sendBoardData(); 
     } 
     public removeNote(note: Note){ 
+		console.log("Removing #" + note.noteId);
         this.notes = this.notes.filter(el => el.noteId != note.noteId); 
-        this.updateCounters(Boolean(0)); 
+        this.updateCounters(-1); 
         const noteToRemove = this.wrapper.querySelector("#note-" + note.noteId); 
         if(noteToRemove) { 
             this.wrapper.removeChild(noteToRemove); 
@@ -121,7 +125,7 @@ export class Board { /* References to HTML elements in a board */
             }), 
             allCount: this.allCount 
         } 
-        console.log(data); 
+        //console.log(data); 
         return JSON.stringify(data); 
     } 
     public sendBoardData(){ 
@@ -130,7 +134,7 @@ export class Board { /* References to HTML elements in a board */
             method: "POST", 
             body: this.getBoardData() 
         }).then(res => res.text()).then(res => 
-            console.log(res) 
+            {}//console.log(res) 
         ); 
     } 
     public importBoardData(){ 
@@ -140,13 +144,14 @@ export class Board { /* References to HTML elements in a board */
         }).then(res => res.text()).then(res => { 
             if(res == "404") { console.log("No board data found. Creating a new board."); return; } 
             let data: IBoard = JSON.parse(res); 
-            console.log(data); 
+            //console.log(data); 
 
-            this.defaultNotePosition.x = data.defaultNotePosition.x; 
-            this.defaultNotePosition.y = data.defaultNotePosition.y; 
-            this.defaultNoteSize.width = data.defaultNoteSize.width; 
-            this.defaultNoteSize.height = data.defaultNoteSize.height; 
+            this.defaultNotePosition.x = data.defaultNotePosition.x ? data.defaultNotePosition.x : 200; 
+            this.defaultNotePosition.y = data.defaultNotePosition.y ? data.defaultNotePosition.y : 200; 
+            this.defaultNoteSize.width = data.defaultNoteSize.width ? data.defaultNoteSize.width : 200; 
+            this.defaultNoteSize.height = data.defaultNoteSize.height ? data.defaultNoteSize.height : 200; 
             this.maxZIndex = data.notes ? data.notes.length : 0; 
+			this.allCount = data.allCount!;
             if(data.notes){ 
                 let temp = JSON.parse((data.notes as unknown as string)); 
                 temp.forEach((note: INote) => { 
@@ -161,21 +166,34 @@ export class Board { /* References to HTML elements in a board */
                                  note.size ? note.size : this.defaultNoteSize, 
                                  note.zindex ? note.zindex : 0); 
                 }); 
-            } 
-            if(data.allCount){ 
-                this.allCount = data.allCount; 
-            } 
-            else{ 
-                this.allCount = this.notes.length; 
-            } 
+            }
+            else{
+				this.notes = [];
+            }
+            console.table(this.notes);
+            this.updateCounters(2); 
         }); 
     } 
     
     /* Private methods */ 
-    /* 1 - increase number of notes; 0 - decrease */ 
-    private updateCounters(increase: boolean){ 
-        this.activeCount = this.notes.length; 
-        this.allCount += increase ? 1 : 0; 
+    /* 1 - adding a new default note - increase counters; 0 - loading a note from database - increase active; -1 - deleting a note - decrease active */ 
+    private updateCounters(mode: number){
+    	switch(mode){
+    		case 1:
+    			this.activeCount++;
+    			this.allCount++;
+    			break;
+    		case 0:
+    			this.activeCount++;
+				break;
+    		case -1: 
+    			this.activeCount--;
+    			break;
+    		default:
+    			break;
+    	}
+		//this.activeCount = this.notes.length; 
+        //this.allCount += increase ? 1 : 0; 
         this.counterAll.innerText = this.allCount.toString(); 
         this.counterActive.innerText = this.activeCount.toString(); 
     } 
