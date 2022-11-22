@@ -19,6 +19,8 @@ export class Board { /* References to HTML elements in a board */
     public maxZIndex: number = 0; 
     
     constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement) { 
+        alert("board constructor");
+
         this.boardId = boardId; 
         this.wrapper = wrapper; 
         this.counterAll = counterAll; 
@@ -59,6 +61,8 @@ export class Board { /* References to HTML elements in a board */
             this.sendBoardData();  
     } 
     public addDefaultNote(){ 
+        alert("add default note");
+
         let id = this.allCount; 
         let title = "Note " + id; 
         let content = encodeURIComponent("Content " + id); 
