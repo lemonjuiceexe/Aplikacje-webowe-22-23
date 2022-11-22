@@ -26,15 +26,15 @@
     ."'". $result["boardId"]. "', "
     ."'". json_encode($result["defaultNotePosition"]). "', "
     ."'". json_encode($result["defaultNoteSize"]). "', "
-    ."'". $result["allCount"]. "', "
+    ."". $result["allCount"]. ", "
     ."'". json_encode($result["notes"]). "') "
     ."ON DUPLICATE KEY UPDATE "
     ."defaultNotePosition='"
     . json_encode($result["defaultNotePosition"]). "', ".
     "defaultNoteSize='"
     . json_encode($result["defaultNoteSize"]). "', ".
-    "allCount='"
-    . $result["allCount"]. "', ".
+    "allCount="
+    . $result["allCount"]. ", ".
     "notes='"
     . json_encode($result["notes"]). "'";
 
