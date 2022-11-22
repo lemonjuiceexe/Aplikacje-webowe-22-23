@@ -7,6 +7,7 @@ export class Board { /* References to HTML elements in a board */
     public wrapper: HTMLDivElement; 
     private counterAll: HTMLSpanElement; 
     private counterActive: HTMLSpanElement; 
+    private nameLabel: HTMLSpanElement;
     /* Readonly consts */ 
     public readonly boardId: string;
     private readonly defaultNotePosition: { x: number, y: number } = { x: 200, y: 200 }; 
@@ -18,11 +19,13 @@ export class Board { /* References to HTML elements in a board */
     private activeCount: number = 0; 
     public maxZIndex: number = 0; 
     
-    constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement) { 
+    constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement, nameLabel: HTMLSpanElement) { 
         this.boardId = boardId; 
         this.wrapper = wrapper; 
         this.counterAll = counterAll; 
-        this.counterActive = counterActive; 
+        this.counterActive = counterActive;
+        this.nameLabel = nameLabel;
+        nameLabel.innerText = boardId;
         
         this.importBoardData(); 
     }
