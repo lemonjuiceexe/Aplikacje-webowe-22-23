@@ -19,8 +19,6 @@ export class Board { /* References to HTML elements in a board */
     public maxZIndex: number = 0; 
     
     constructor(boardId: string, wrapper: HTMLDivElement, counterAll: HTMLSpanElement, counterActive: HTMLSpanElement) { 
-        alert("board constructor");
-
         this.boardId = boardId; 
         this.wrapper = wrapper; 
         this.counterAll = counterAll; 
@@ -28,10 +26,6 @@ export class Board { /* References to HTML elements in a board */
         
         this.importBoardData(); 
     }
-    
-	/*public test(){
-		alert("Test"); console.log("test");
-	}*/
      
     /*Public methods */ 
     public addNote(title: string, content: string,
@@ -66,8 +60,6 @@ export class Board { /* References to HTML elements in a board */
             this.sendBoardData();  
     } 
     public addDefaultNote(){ 
-        //alert("add default note");
-
         let id = this.allCount; 
         let title = "Note " + id; 
         let content = encodeURIComponent("Content " + id); 
@@ -193,8 +185,7 @@ export class Board { /* References to HTML elements in a board */
     		default:
     			break;
     	}
-		alert("hahah smieszne update counterow~!");
-        //this.activeCount = this.notes.length; 
+		//this.activeCount = this.notes.length; 
         //this.allCount += increase ? 1 : 0; 
         this.counterAll.innerText = this.allCount.toString(); 
         this.counterActive.innerText = this.activeCount.toString(); 
