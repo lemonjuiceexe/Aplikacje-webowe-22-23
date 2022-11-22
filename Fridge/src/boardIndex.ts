@@ -1,4 +1,4 @@
-import { Board } from "./board";
+import { Board } from "./board.js";
 
 const wrapper = document.querySelector(".wrapper") as HTMLDivElement;
 const addNoteButton = wrapper.querySelector(".spawn-button") as HTMLDivElement;
