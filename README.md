@@ -9,4 +9,4 @@ Vanilla JS minesweeper game.
 A sticky notes board with frontend written in TypeScript, using a WYSIWYG editor TinyMCE, compiled with Webpack. Backend, keeping track of your notes between sessions, consists of an nginx server, MariaDB relational database and PHP scripts.
 
 ## Tic tac toe
-A tic tac toe game written in Angular with TypeScript. The game is played against an unbeatable AI, which uses the [minimax algorithm](https://en.wikipedia.org/wiki/Minimax) algorithm to find the best possible move.
+A tic tac toe game written in Angular with TypeScript. The game is played against an unbeatable AI, which uses the [minimax algorithm](https://en.wikipedia.org/wiki/Minimax) to find the best possible move.
