@@ -113,34 +113,43 @@ export class BoardComponent {
 		return 0;
 	}
 
-	public minimax(position: string[][], depth: number, isMaximizingPlayer: boolean): number
+	public minimax(position: string[][], depth: number, isMaximizingPlayer: boolean): {score: number, depth: number}
 	{
 		let score = this.evaluatePosition(position);
 
 		// If somebody won
 		if (score == Infinity || score == -Infinity) {
-			return score;
+			return {score: score, depth: depth};
 		}
 
 		// No moves left and no winner, therefore a tie
 		if (!this.areMovesLeft(position)) {
-			return 0;
+			return {score: 0, depth: depth};
 		}
 
 		// If this maximizer's move
 		if (isMaximizingPlayer)
 		{
-			let best = -Infinity;
+			let best: {score: number, depth: number} = {score: -Infinity, depth: Infinity};
 			// All possible moves
 			for(let i = 0; i < 3; i++) {
 				for(let j = 0; j < 3; j++) {
 					// Check if cell is empty
-					if (position[i][j]=='-') {
+					if (position[i][j] == '-') {
 						// Make the move
 						position[i][j] = "x";
 
 						// Recursive minimax
-						best = Math.max(best, this.minimax(position, depth + 1, !isMaximizingPlayer));
+						let minimaxValue: {score: number, depth: number} = this.minimax(position, depth + 1, !isMaximizingPlayer);
+						if(minimaxValue.score == best.score){
+							if(minimaxValue.depth <= best.depth){
+								best = minimaxValue;
+							}
+						}
+						else{
+							best = minimaxValue.score > best.score ? minimaxValue : best;
+							// best = Math.max(best, this.minimax(position, depth + 1, !isMaximizingPlayer).score);
+						}
 						// Undo the move
 						position[i][j] = '-';
 					}
@@ -151,7 +160,7 @@ export class BoardComponent {
 
 		// If this minimizer's move
 		else {
-			let best = Infinity;
+			let best: {score: number, depth: number} = {score: Infinity, depth: Infinity};
 			// All possible moves
 			for(let i = 0; i < 3; i++) {
 				for(let j = 0; j < 3; j++) {
@@ -161,19 +170,29 @@ export class BoardComponent {
 						position[i][j] = "o";
 
 						// Recursive minimax
-						best = Math.min(best, this.minimax(position, depth + 1, !isMaximizingPlayer));
+						let minimaxValue: {score: number, depth: number} = this.minimax(position, depth + 1, !isMaximizingPlayer);
+						if(minimaxValue.score == best.score){
+							if(minimaxValue.depth <= best.depth){
+								best = minimaxValue;
+							}
+						}
+						else{
+							best = best.score > minimaxValue.score ? minimaxValue : best;
+							// best = Math.min(best, this.minimax(position, depth + 1, !isMaximizingPlayer).score);
+						}
 
 						// Undo the move
 						position[i][j] = '-';
 					}
 				}
 			}
+			console.log({score: best.score, depth: depth});
 			return best;
 		}
 	}
 
 	public findBestMove(position: string[][], isMaximizingPlayer: boolean): { row: number, column: number }{
-		let bestValue = isMaximizingPlayer ? -Infinity : Infinity;
+		let bestValue = isMaximizingPlayer ? {score: -Infinity, depth: Infinity} : {score: Infinity, depth: Infinity};
 		let bestMove = { row: -1, column: -1};
 
 		// Run minimax for every possible tile
@@ -186,9 +205,14 @@ export class BoardComponent {
 					position[i][j] = "-";
 					// If evaluation for this move is better than current best move, update the best move
 					if (isMaximizingPlayer ?
-						evaluationForMove > bestValue :
-						evaluationForMove < bestValue){
+						evaluationForMove.score > bestValue.score :
+						evaluationForMove.score < bestValue.score){
 
+						bestValue = evaluationForMove;
+						bestMove = {row: i, column: j};
+					}
+					// If evaluation is the same, but the win is quicker, also update the best move
+					if(evaluationForMove.score == bestValue.score && evaluationForMove.depth <= bestValue.depth){
 						bestValue = evaluationForMove;
 						bestMove = {row: i, column: j};
 					}
