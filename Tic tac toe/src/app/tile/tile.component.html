@@ -1,0 +1,3 @@
+<div class="tile" (click)="playMove(board!.currentMove)">
+	<p [class.x]="value == 'x'" [class.o]="value == 'o'" [class.empty]="value == '-'">{{value | uppercase}}</p>
+</div>

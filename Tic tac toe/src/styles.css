@@ -1,0 +1,22 @@
+@import url("reset.css");
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani&display=swap');
+
+:root{
+	--background: #2C3333;
+	--secondary: #395B64;
+	--primary: #A5C9CA;
+	--light: #E7F6F2;
+}
+
+app-root{
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
+	width: 100vw;
+	min-height: 100vh;
+	font-size: 2rem;
+	background-color: var(--background);
+	color: var(--light);
+	font-family: 'Rajdhani', sans-serif;
+}

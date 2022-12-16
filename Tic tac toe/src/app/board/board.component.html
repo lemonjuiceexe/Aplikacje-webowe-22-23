@@ -1,0 +1,18 @@
+<p>Player: {{ playerSide | uppercase}}; Computer: {{ (playerSide == "x" ? "o" : "x") | uppercase}}</p>
+<p><button (click)="restart()">Play again!</button></p>
+<!--<p>Best move <br>-->
+<!--	Row: {{ findBestMove(boardArray, currentMove == "x").row }} <br>-->
+<!--	Column: {{ findBestMove(boardArray, currentMove == "x").column }}-->
+<!--&lt;!&ndash;	Column: {{ findBestMove([&ndash;&gt;-->
+<!--&lt;!&ndash;		[ 'x', 'x', 'o' ],&ndash;&gt;-->
+<!--&lt;!&ndash;		[ 'o', 'o', 'x' ],&ndash;&gt;-->
+<!--&lt;!&ndash;		[ '-', '-', '-' ] ], currentMove == "x").column }}&ndash;&gt;-->
+<!--</p>-->
+
+<section class="board">
+		<app-tile *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7, 8]"
+				  [board]="this" [row]="calculateRow(i)" [column]="i % 3" >
+
+		</app-tile>
+		<br>
+</section>
