@@ -3,5 +3,4 @@
 Fridge/node_modules/
 Fridge/dist/
 */node_modules/
-*/package-lock.json
-*/package.json
+.idea/

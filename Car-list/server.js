@@ -1,10 +1,13 @@
 const express = require('express');
 const path = require('path');
+const parser = require('body-parser');
 const hbs = require('express-handlebars');
+const nedb = require('nedb');
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(express.static(path.join(__dirname, "node_modules/bootstrap/dist/")));
+app.use(parser.urlencoded({ extended: false }));
 
 // --- Handlebars setup ---
 app.set('views', path.join(__dirname, 'views'));
@@ -15,12 +18,42 @@ app.engine('hbs', hbs({
 }));
 app.set('view engine', 'hbs');
 
+// --- Database setup ---
+const database = new nedb({
+	filename: 'cars.db',
+	autoload: true
+});
 
 // --- Routing ---
 app.get('/', (req, res) => {
 	res.render('dashboard.hbs');
 });
+// Form for adding a record
+app.get('/add', (req, res) => {
+	res.render('add.hbs');
+});
+// Form submission handler
+app.post('/handleAddCar', (req, res) => {
+	const record = {
+		insurance: req.body.insurance  === undefined ? false : true,
+		gas: req.body.gas === undefined ? false : true,
+		damaged: req.body.damaged === undefined ? false : true,
+		fourbyfour: req.body.fourbyfour === undefined ? false : true
+	};
+	database.insert(record, (error, newDoc) => {
+		if (error){
+			console.log(error);
+			res.status(500).set('Content-Type', 'text/plain').send('Error adding record to database');
+		}
+	});
+	res.status(200).set('Content-Type', 'text/plain').send('Record successfully added to database');
+});
 app.get('/list', (req, res) => {
+	const records = database.find({}, (error, docs) => {
+		if (error) console.log(error);
+		console.log('---- Found the following records: ---- ')
+		console.log(docs);
+	});
 	res.render('list.hbs');
 });
 
