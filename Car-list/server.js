@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 app.get('/add', (req, res) => {
 	res.render('add.hbs');
 });
-// Form submission handler
+// Form submission handlers
 app.post('/handleAddCar', (req, res) => {
 	const record = {
 		insurance: req.body.insurance === undefined ? false : true,
@@ -48,8 +48,24 @@ app.post('/handleAddCar', (req, res) => {
 	});
 	res.status(200).set('Content-Type', 'text/plain').send('Record successfully added to database');
 });
+app.post('/handleDeleteCar', (req, res) => {
+	database.remove({ _id: req.body.id }, {}, (error, numRemoved) => {
+		if (error){
+			console.log(error);
+			res.status(500).set('Content-Type', 'text/plain').send('Error deleting record from database');
+		}
+		console.log('Successfully deleted ' + numRemoved + ' record(s)');
+		const newRecords = database.find({}, (error, docs) => {
+			if (error) {
+				console.log(error);
+				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+			}
+			res.status(200).render('list.hbs', { records: docs, keys: Object.keys(docs[0]) });
+		});
+	});
+});
 app.get('/list', (req, res) => {
-	database.find({}, (error, docs) => { //TODO: it's obviously async
+	database.find({}, (error, docs) => {
 		if (error) {
 			console.log(error);
 			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');

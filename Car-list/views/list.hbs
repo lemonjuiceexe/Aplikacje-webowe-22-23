@@ -8,6 +8,7 @@
         <th>Insurance</th>
         <th>Gas</th>
         <th>4x4</th>
+        <th>Delete record</th>
     </tr>
     </thead>
     <tbody>
@@ -36,6 +37,12 @@
                     text-danger
                 {{/if}}
             ">{{fourbyfour}}</td>
+            <td class="col-sm-2">
+                <form action="/handleDeleteCar" method="POST">
+                    <input type="hidden" name="id" value="{{_id}}">
+                    <button type="submit" class="btn btn-danger container-fluid">Delete</button>
+                </form>
+            </td>
         </tr>
     {{/each}}
     </tbody>
