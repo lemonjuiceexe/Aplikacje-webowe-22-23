@@ -35,7 +35,7 @@ app.get('/add', (req, res) => {
 // Form submission handler
 app.post('/handleAddCar', (req, res) => {
 	const record = {
-		insurance: req.body.insurance  === undefined ? false : true,
+		insurance: req.body.insurance === undefined ? false : true,
 		gas: req.body.gas === undefined ? false : true,
 		damaged: req.body.damaged === undefined ? false : true,
 		fourbyfour: req.body.fourbyfour === undefined ? false : true
@@ -49,12 +49,13 @@ app.post('/handleAddCar', (req, res) => {
 	res.status(200).set('Content-Type', 'text/plain').send('Record successfully added to database');
 });
 app.get('/list', (req, res) => {
-	const records = database.find({}, (error, docs) => {
-		if (error) console.log(error);
-		console.log('---- Found the following records: ---- ')
-		console.log(docs);
+	database.find({}, (error, docs) => { //TODO: it's obviously async
+		if (error) {
+			console.log(error);
+			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+		}
+		res.render('list.hbs', { records: docs, keys: Object.keys(docs[0]) });
 	});
-	res.render('list.hbs');
 });
 
 // --- Server start ---

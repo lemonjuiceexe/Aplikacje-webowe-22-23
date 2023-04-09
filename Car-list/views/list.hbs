@@ -1,2 +1,42 @@
 {{>navbar}}
-<h2>list</h2>
+<h2 class="m-3">list</h2>
+<table class="table table-striped table-bordered container mx-auto m-5">
+    <thead>
+    <tr>
+        <th>l.p.</th>
+        <th>ID</th>
+        <th>Insurance</th>
+        <th>Gas</th>
+        <th>4x4</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each records}}
+        <tr class="fw-bold">
+            <td class="text-info">{{@index}}</td>
+            <td class="text-info">{{_id}}</td>
+            <td class="
+                {{#if insurance}}
+                    text-success
+                {{else}}
+                    text-danger
+                {{/if}}
+            ">{{insurance}}</td>
+            <td class="
+                {{#if gas}}
+                    text-success
+                {{else}}
+                    text-danger
+                {{/if}}
+            ">{{gas}}</td>
+            <td class="
+                {{#if fourbyfour}}
+                    text-success
+                {{else}}
+                    text-danger
+                {{/if}}
+            ">{{fourbyfour}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
