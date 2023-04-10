@@ -1,0 +1,22 @@
+<!-- Checkboxes for fields -->
+<form action="/handleEditCar" method="POST">
+<td>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="insurance-checkbox" name="insurance" {{#if insurance}}checked{{/if}}>
+    </div>
+</td>
+<td>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="gas-checkbox" name="gas" {{#if gas}}checked{{/if}}>
+    </div>
+</td>
+<td>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="fourbyfour-checkbox" name="fourbyfour" {{#if fourbyfour}}checked{{/if}}>
+    </div>
+</td>
+<td>
+    <input type="hidden" name="id" value="{{_id}}">
+    <button type="submit" class="btn btn-success container-fluid">Save</button>
+</td>
+</form>

@@ -5,10 +5,14 @@
     <tr>
         <th>l.p.</th>
         <th>ID</th>
-        <th>Insurance</th>
-        <th>Gas</th>
-        <th>4x4</th>
-        <th>Delete record</th>
+        <th><label for="insurance-checkbox">Insurance</label></th>
+        <th><label for="gas-checkbox">Gas</label></th>
+        <th><label for="fourbyfour-checkbox">4x4</label></th>
+        {{#if edit}}
+            <th>Edit record</th>
+        {{else}}
+            <th>Delete record</th>
+        {{/if}}
     </tr>
     </thead>
     <tbody>
@@ -16,32 +20,28 @@
         <tr class="fw-bold">
             <td class="text-info">{{@index}}</td>
             <td class="text-info">{{_id}}</td>
-            <td class="
-                {{#if insurance}}
-                    text-success
-                {{else}}
-                    text-danger
-                {{/if}}
-            ">{{insurance}}</td>
-            <td class="
-                {{#if gas}}
-                    text-success
-                {{else}}
-                    text-danger
-                {{/if}}
-            ">{{gas}}</td>
-            <td class="
-                {{#if fourbyfour}}
-                    text-success
-                {{else}}
-                    text-danger
-                {{/if}}
-            ">{{fourbyfour}}</td>
+            {{#if editThisRecord }}
+                {{> car-edit-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+            {{else}}
+                <form action="/handleCarEditList" method="POST">
+                {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+            {{/if}}
+
+            <!-- Delete or edit button -->
             <td class="col-sm-2">
-                <form action="/handleDeleteCar" method="POST">
-                    <input type="hidden" name="id" value="{{_id}}">
-                    <button type="submit" class="btn btn-danger container-fluid">Delete</button>
-                </form>
+                {{#if editThisRecord}}
+                    <!-- Do nothing in this case, as this form is generated in car-edit-table-row partial -->
+                <!-- ../ references a variable from parent context - edit is not a part of each loop -->
+                {{else if ../edit}}
+                        <input type="hidden" name="id" value="{{_id}}">
+                        <button type="submit" class="btn btn-warning container-fluid">Edit</button>
+                    </form>
+                {{else}}
+                    <form action="/handleDeleteCar" method="POST">
+                        <input type="hidden" name="id" value="{{_id}}">
+                        <button type="submit" class="btn btn-danger container-fluid">Delete</button>
+                    </form>
+                {{/if}}
             </td>
         </tr>
     {{/each}}

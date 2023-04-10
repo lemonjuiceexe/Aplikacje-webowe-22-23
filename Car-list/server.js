@@ -32,6 +32,38 @@ app.get('/', (req, res) => {
 app.get('/add', (req, res) => {
 	res.render('add.hbs');
 });
+// Table with all records with option to delete
+app.get('/list', (req, res) => {
+	database.find({}, (error, docs) => {
+		if (error) {
+			console.log(error);
+			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+		}
+		res.render('list.hbs',
+			{
+				records: docs,
+				keys: Object.keys(docs[0]),
+				edit: false
+			}
+		);
+	});
+});
+// Table with all records with option to edit
+app.get('/edit', (req, res) => {
+	database.find({}, (error, docs) => {
+		if (error) {
+			console.log(error);
+			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+		}
+		res.render('list.hbs',
+			{
+				records: docs,
+				keys: Object.keys(docs[0]),
+				edit: true
+			}
+		);
+	});
+});
 // Form submission handlers
 app.post('/handleAddCar', (req, res) => {
 	const record = {
@@ -49,28 +81,76 @@ app.post('/handleAddCar', (req, res) => {
 	res.status(200).set('Content-Type', 'text/plain').send('Record successfully added to database');
 });
 app.post('/handleDeleteCar', (req, res) => {
-	database.remove({ _id: req.body.id }, {}, (error, numRemoved) => {
+	database.remove({ _id: req.body.id }, {}, (error, numberOfDeletedDocs) => {
 		if (error){
 			console.log(error);
 			res.status(500).set('Content-Type', 'text/plain').send('Error deleting record from database');
 		}
-		console.log('Successfully deleted ' + numRemoved + ' record(s)');
+		console.log('Successfully deleted ' + numberOfDeletedDocs + ' record(s)');
 		const newRecords = database.find({}, (error, docs) => {
 			if (error) {
 				console.log(error);
 				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
 			}
-			res.status(200).render('list.hbs', { records: docs, keys: Object.keys(docs[0]) });
+			res.render('list.hbs',
+			{
+				records: docs,
+				keys: Object.keys(docs[0]),
+				edit: false
+			});
 		});
 	});
 });
-app.get('/list', (req, res) => {
-	database.find({}, (error, docs) => {
-		if (error) {
+app.post('/handleEditCar', (req, res) => {
+	console.log("New doc: " + JSON.stringify(req.body) + req.body.insurance + " " + req.body.gas + " " + req.body.fourbyfour);
+	database.update({ _id: req.body.id },
+		{
+			insurance: req.body.insurance === undefined ? false : true,
+			gas: req.body.gas === undefined ? false : true,
+			fourbyfour: req.body.fourbyfour === undefined ? false : true
+		},
+		{}, (error, numberOfReplacedDocs) => {
+		if (error){
 			console.log(error);
-			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+			res.status(500).set('Content-Type', 'text/plain').send('Error updating record in database');
 		}
-		res.render('list.hbs', { records: docs, keys: Object.keys(docs[0]) });
+		console.log('Successfully updated ' + numberOfReplacedDocs + ' record(s)');
+		const newRecords = database.find({}, (error, docs) => {
+			if (error) {
+				console.log(error);
+				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+			}
+			res.render('list.hbs',
+			{
+				records: docs,
+				keys: Object.keys(docs[0]),
+				edit: true
+			});
+		});
+	});
+});
+// Display list of cars with edit button
+app.post('/handleCarEditList', (req, res) => {
+	database.find({}, (error, docs) => {
+		// Find the record to edit and change it to only have it's id and edit: true
+		docs = docs.map(doc => {
+			if (doc._id === req.body.id) {
+				return {
+					_id: doc._id,
+					editThisRecord: true,
+					insurance: doc.insurance,
+					gas: doc.gas,
+					fourbyfour: doc.fourbyfour
+				};
+			}
+			return doc;
+		});
+		res.render('list.hbs',
+		{
+			records: docs,
+			keys: Object.keys(docs[0]),
+			edit: true
+		});
 	});
 });
 
