@@ -3,7 +3,7 @@
 <table class="table table-striped table-bordered container mx-auto m-5">
     <thead>
     <tr>
-        <th>l.p.</th>
+        <th>no.</th>
         <th>ID</th>
         <th><label for="insurance-checkbox">Insurance</label></th>
         <th><label for="gas-checkbox">Gas</label></th>
@@ -20,13 +20,16 @@
         <tr class="fw-bold">
             <td class="text-info">{{@index}}</td>
             <td class="text-info">{{_id}}</td>
-            {{#if editThisRecord }}
-                {{> car-edit-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+            {{#if ../edit}}
+                {{#if editThisRecord }}
+                    {{> car-edit-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+                {{else}}
+                    <form action="/handleCarEditList" method="POST">
+                    {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+                {{/if}}
             {{else}}
-                <form action="/handleCarEditList" method="POST">
                 {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
             {{/if}}
-
             <!-- Delete or edit button -->
             <td class="col-sm-2">
                 {{#if editThisRecord}}
