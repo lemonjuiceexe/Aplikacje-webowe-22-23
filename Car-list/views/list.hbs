@@ -31,21 +31,20 @@
                 {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
             {{/if}}
             <!-- Delete or edit button -->
-            <td class="col-sm-2">
-                {{#if editThisRecord}}
-                    <!-- Do nothing in this case, as this form is generated in car-edit-table-row partial -->
-                <!-- ../ references a variable from parent context - edit is not a part of each loop -->
-                {{else if ../edit}}
+            {{#unless editThisRecord}}
+                <td class="col-sm-2">
+                {{#if ../edit}}
                         <input type="hidden" name="id" value="{{_id}}">
                         <button type="submit" class="btn btn-warning container-fluid">Edit</button>
                     </form>
                 {{else}}
-                    <form action="/handleDeleteCar" method="POST">
+                    <form action="/handleCarDeleteList" method="POST">
                         <input type="hidden" name="id" value="{{_id}}">
                         <button type="submit" class="btn btn-danger container-fluid">Delete</button>
                     </form>
                 {{/if}}
-            </td>
+                </td>
+            {{/unless}}
         </tr>
     {{/each}}
     </tbody>
