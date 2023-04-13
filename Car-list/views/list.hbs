@@ -19,17 +19,21 @@
     <tbody>
     {{#each records}}
         <tr class="fw-bold">
-            <td class="text-info">{{@index}}</td>
-            <td class="text-info">{{_id}}</td>
+            <td>{{@index}}</td>
+            <td class="text-primary">{{_id}}</td>
             {{#if ../edit}}
+                <!-- Currently inline edited record -->
                 {{#if editThisRecord }}
-                    {{> car-edit-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+                    {{> car-edit-table-row insurance=insurance gas=gas damaged=damaged fourbyfour=fourbyfour}}
                 {{else}}
+                <!-- Record with an edit button -->
+                <!-- Form starts here, so all edited fields (in partial) are included. It is closed below. -->
                     <form action="/handleCarEditList" method="POST">
-                    {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+                    {{> car-table-row insurance=insurance gas=gas damaged=damaged fourbyfour=fourbyfour}}
                 {{/if}}
             {{else}}
-                {{> car-table-row insurance=insurance gas=gas fourbyfour=fourbyfour}}
+                <!-- Record with a delete button. Form is included below. -->
+                {{> car-table-row insurance=insurance gas=gas damaged=damaged fourbyfour=fourbyfour}}
             {{/if}}
             <!-- Delete or edit button -->
             {{#unless editThisRecord}}
@@ -39,7 +43,7 @@
                         <button type="submit" class="btn btn-warning container-fluid">Edit</button>
                     </form>
                 {{else}}
-                    <form action="/handleCarDeleteList" method="POST">
+                    <form action="/handleDeleteCar" method="POST">
                         <input type="hidden" name="id" value="{{_id}}">
                         <button type="submit" class="btn btn-danger container-fluid">Delete</button>
                     </form>

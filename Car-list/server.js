@@ -117,7 +117,7 @@ app.post('/handleDeleteCar', (req, res) => {
 				console.log(error);
 				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
 			}
-			res.status()
+			res.status(200).redirect('/list');
 		});
 	});
 });
