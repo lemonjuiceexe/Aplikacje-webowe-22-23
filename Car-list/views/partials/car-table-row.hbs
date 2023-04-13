@@ -1,21 +1,12 @@
 <td class="
-    {{#if insurance}}
-        text-success
-    {{else}}
-        text-danger
-    {{/if}}
-">{{insurance}}</td>
+    {{colorClassForBoolean insurance}}
+">{{formatBoolean insurance}}</td>
 <td class="
-    {{#if gas}}
-        text-success
-    {{else}}
-        text-danger
-    {{/if}}
-">{{gas}}</td>
+    {{colorClassForBoolean gas}}
+">{{formatBoolean gas}}</td>
 <td class="
-    {{#if fourbyfour}}
-        text-success
-    {{else}}
-        text-danger
-    {{/if}}
-">{{fourbyfour}}</td>
+    {{colorClassForBoolean damaged}}
+">{{formatBoolean damaged}}</td>
+<td class="
+    {{colorClassForBoolean fourbyfour}}
+">{{formatBoolean fourbyfour}}</td>

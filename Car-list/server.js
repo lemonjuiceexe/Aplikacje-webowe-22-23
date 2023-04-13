@@ -14,7 +14,32 @@ app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', hbs({
 	defaultLayout: 'main.hbs',
 	partialsDir: 'views/partials',
-	extname: 'hbs'
+	extname: 'hbs',
+	helpers: {
+		// Formats a boolean into a string
+		formatBoolean: value => {
+			switch (value){
+				case true:
+					return 'YES';
+				case false:
+					return 'NO';
+				default:
+					return 'NO DATA';
+			}
+		},
+		// Returns the bootstrap class for the text color based on the boolean value
+		colorClassForBoolean: value => {
+			switch (value){
+				case true:
+					return 'text-success';
+				case false:
+					return 'text-danger';
+				// Undefined
+				default:
+					return 'text-info';
+			}
+		}
+	}
 }));
 app.set('view engine', 'hbs');
 
@@ -92,12 +117,7 @@ app.post('/handleDeleteCar', (req, res) => {
 				console.log(error);
 				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
 			}
-			res.render('list.hbs',
-			{
-				records: docs,
-				keys: Object.keys(docs[0]),
-				edit: false
-			});
+			res.status()
 		});
 	});
 });
