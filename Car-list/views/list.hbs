@@ -43,7 +43,7 @@
                         <button type="submit" class="btn btn-warning container-fluid">Edit</button>
                     </form>
                 {{else}}
-                    <form action="/handleDeleteCar" method="POST">
+                    <form action="/handleDeleteCar" method="POST" onsubmit="return confirm('Are you sure you want to delete?');">
                         <input type="hidden" name="id" value="{{_id}}">
                         <button type="submit" class="btn btn-danger container-fluid">Delete</button>
                     </form>
