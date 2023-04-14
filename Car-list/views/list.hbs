@@ -19,8 +19,8 @@
     <tbody>
     {{#each records}}
         <tr class="fw-bold">
-            <td>{{@index}}</td>
-            <td class="text-primary">{{_id}}</td>
+            <td>{{increment @index}}</td>
+            <td>{{_id}}</td>
             {{#if ../edit}}
                 <!-- Currently inline edited record -->
                 {{#if editThisRecord }}

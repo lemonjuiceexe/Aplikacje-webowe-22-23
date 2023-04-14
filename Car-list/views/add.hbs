@@ -1,5 +1,15 @@
 {{>navbar}}
 <h2 class="m-3">add</h2>
+{{#if message}}
+    <div class="alert alert-success show container ms-3" role="alert">
+        {{message}}
+    </div>
+{{/if}}
+{{#if error}}
+    <div class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+{{/if}}
 <form class="ms-4" action="/handleAddCar" method="POST">
     <input type="hidden" name="test" value="test">
     <div class="form-group mb-3">

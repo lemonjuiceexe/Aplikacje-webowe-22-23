@@ -38,7 +38,8 @@ app.engine('hbs', hbs({
 				default:
 					return 'text-info';
 			}
-		}
+		},
+		increment: value => ++value
 	}
 }));
 app.set('view engine', 'hbs');
@@ -100,10 +101,10 @@ app.post('/handleAddCar', (req, res) => {
 	database.insert(record, (error, newDoc) => {
 		if (error){
 			console.log(error);
-			res.status(500).set('Content-Type', 'text/plain').send('Error adding record to database');
+			res.status(500).render('add.hbs', { error: `Failed to add a new record. Try again later.` });
 		}
+		res.status(200).render('add.hbs', { message: `Record added successfully with id ${newDoc._id}` });
 	});
-	res.status(200).set('Content-Type', 'text/plain').send('Record successfully added to database');
 });
 app.post('/handleDeleteCar', (req, res) => {
 	database.remove({ _id: req.body.id }, {}, (error, numberOfDeletedDocs) => {
