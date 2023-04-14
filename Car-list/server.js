@@ -39,6 +39,14 @@ app.engine('hbs', hbs({
 					return 'text-info';
 			}
 		},
+		// Returns 1 for true, 0 for false, and -1 for undefined
+		boolStatus: value => {
+			if(value === undefined){
+				return -1;
+			}
+			return value ? 1 : 0;
+		},
+		eq: (a, b) => a === b,
 		increment: value => ++value
 	}
 }));
@@ -65,10 +73,16 @@ app.get('/list', (req, res) => {
 			console.log(error);
 			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
 		}
+		let keys = [];
+		try{
+			keys = Object.keys(docs[0]);
+		} catch{
+			keys = ["id"];
+		}
 		res.render('list.hbs',
 			{
 				records: docs,
-				keys: Object.keys(docs[0]),
+				keys: keys,
 				edit: false
 			}
 		);
@@ -81,10 +95,17 @@ app.get('/edit', (req, res) => {
 			console.log(error);
 			res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
 		}
+		console.log(docs);
+		let keys = [];
+		try{
+			keys = Object.keys(docs[0]);
+		} catch{
+			keys = ["id"];
+		}
 		res.render('list.hbs',
 			{
 				records: docs,
-				keys: Object.keys(docs[0]),
+				keys: keys,
 				edit: true
 			}
 		);
@@ -123,32 +144,56 @@ app.post('/handleDeleteCar', (req, res) => {
 	});
 });
 app.post('/handleEditCar', (req, res) => {
-	console.log("New doc: " + JSON.stringify(req.body) + req.body.insurance + " " + req.body.gas + " " + req.body.fourbyfour);
-	database.update({ _id: req.body.id },
-		{
-			insurance: req.body.insurance === undefined ? false : true,
-			gas: req.body.gas === undefined ? false : true,
-			fourbyfour: req.body.fourbyfour === undefined ? false : true
-		},
-		{}, (error, numberOfReplacedDocs) => {
-		if (error){
-			console.log(error);
-			res.status(500).set('Content-Type', 'text/plain').send('Error updating record in database');
-		}
-		console.log('Successfully updated ' + numberOfReplacedDocs + ' record(s)');
-		const newRecords = database.find({}, (error, docs) => {
-			if (error) {
-				console.log(error);
-				res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+	// console.log("New doc: " + JSON.stringify(req.body) + req.body.insurance + " " + req.body.gas + " " + req.body.fourbyfour);
+
+	let updatedRecord = {};
+	// Incoming request defines all values as -1 (undefined), 0 (false) or 1 (true).
+	// If undefined, the updated record should not contain said value.
+	// Otherwise, the updated record should have this value set to true or false accordingly.
+	for(let key of ["insurance", "gas", "damaged", "fourbyfour"]){ //TODO: If ever refactoring this, probably should not hard-code these keys anywhere
+		if(req.body[key] !== "-1"){
+			let valueToSet;
+			console.log(key);
+			console.log(typeof(req.body[key]));
+			switch (req.body[key]){
+				case "0":
+					valueToSet = false;
+					break;
+				case "1":
+					valueToSet = true;
+					break;
+				default:
+					res.status(400).set('Content-Type', 'text/plain').send('Encountered Invalid parameter in POST request.');
+					return;
 			}
-			res.render('list.hbs',
-			{
-				records: docs,
-				keys: Object.keys(docs[0]),
-				edit: true
+			updatedRecord[key] = valueToSet;
+		}
+	}
+
+	database.update({ _id: req.body.id },
+		updatedRecord,
+		{},
+		(error, numberOfReplacedDocs) => {
+			if (error){
+				console.log(error);
+				res.status(500).set('Content-Type', 'text/plain').send('Error updating record in database');
+			}
+			console.log('Successfully updated ' + numberOfReplacedDocs + ' record(s)');
+			console.log("New record: " + JSON.stringify(updatedRecord));
+			const newRecords = database.find({}, (error, docs) => {
+				if (error) {
+					console.log(error);
+					res.status(500).set('Content-Type', 'text/plain').send('Error reading database');
+				}
+				res.render('list.hbs',
+				{
+					records: docs,
+					keys: Object.keys(docs[0]),
+					edit: true
+				});
 			});
-		});
-	});
+		}
+	);
 });
 // Display list of cars with edit button
 app.post('/handleCarEditList', (req, res) => {
@@ -161,6 +206,7 @@ app.post('/handleCarEditList', (req, res) => {
 					editThisRecord: true,
 					insurance: doc.insurance,
 					gas: doc.gas,
+					damaged: doc.damaged,
 					fourbyfour: doc.fourbyfour
 				};
 			}
